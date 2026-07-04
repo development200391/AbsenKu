@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/api_client.dart';
 import 'core/auth_session.dart';
+import 'core/brand.dart';
 import 'core/secure_storage.dart';
 import 'features/attendance/data/attendance_repository.dart';
 import 'features/auth/auth_repository.dart';
@@ -86,7 +87,10 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
 
         return MaterialApp.router(
           title: 'AbsenKu',
-          theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Brand.seed),
+            useMaterial3: true,
+          ),
           routerConfig: _router,
         );
       },

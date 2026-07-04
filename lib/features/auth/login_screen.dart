@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/auth_session.dart';
+import '../../core/brand.dart';
 import 'auth_repository.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -70,12 +71,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.badge_outlined, size: 72),
-                  const SizedBox(height: 12),
+                  const Center(child: AbsenKuMark(size: 88, tile: true, showRing: true)),
+                  const SizedBox(height: 16),
                   Text(
                     'AbsenKu',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: Brand.teal,
+                        ),
                   ),
                   const SizedBox(height: 32),
                   TextFormField(

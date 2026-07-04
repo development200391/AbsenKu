@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/auth_session.dart';
+import '../../../core/brand.dart';
 import '../../auth/auth_repository.dart';
 import '../data/attendance_repository.dart';
 import '../data/location_helper.dart';
@@ -99,7 +100,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AbsenKu'),
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AbsenKuMark(size: 28, tile: false),
+            SizedBox(width: 10),
+            Text('AbsenKu'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
