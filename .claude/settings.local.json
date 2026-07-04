@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build *)",
+      "Bash(dotnet tool *)",
+      "Bash(dotnet ef *)",
+      "Bash(dotnet new *)",
+      "Bash(cd /d/NET/SINARA/ERP.Infrastructure && dotnet tool run dotnet-ef migrations add AddAttendanceGpsSelfService --startup-project ../ERP.API --project . > /tmp/mig_out.txt 2>&1; grep -i \"decimal\\\\|precision\\\\|warning\" /tmp/mig_out.txt | head -50)",
+      "Read(//tmp/**)",
+      "Bash(cp /d/NET/SINARA/dotnet-tools.json /tmp/sinara-probe/dotnet-tools.json)",
+      "Bash(mkdir -p /tmp/sinara-probe/.config)",
+      "Bash(cp /d/NET/SINARA/dotnet-tools.json /tmp/sinara-probe/.config/dotnet-tools.json)",
+      "Read(//tmp/sinara-probe/**)",
+      "Bash(dotnet list *)",
+      "Bash(git -C /d/NET/SINARA worktree remove /tmp/sinara-probe --force)",
+      "Bash(dotnet restore *)",
+      "Bash(dotnet nuget *)",
+      "Bash(find ~/.nuget/packages/efcore.namingconventions -iname \"*.nuspec\" 2>/dev/null | head -5)",
+      "Read(//c/Users/kokos/.nuget/packages/efcore.namingconventions/**)",
+      "Bash(find ~/.nuget/packages/npgsql.entityframeworkcore.postgresql -iname \"*.nuspec\" 2>/dev/null)",
+      "Read(//c/Users/kokos/.nuget/packages/npgsql.entityframeworkcore.postgresql/**)",
+      "Read(//c/Users/kokos/.nuget/packages/microsoft.entityframeworkcore.design/**)",
+      "Bash(xargs cat)",
+      "Bash(flutter --version)",
+      "PowerShell(flutter --version)",
+      "Bash(/c/Users/kokos/flutter/bin/flutter.bat --version)",
+      "Bash(/c/Users/kokos/flutter/bin/flutter.bat create *)",
+      "Bash(/c/Users/kokos/flutter/bin/flutter.bat pub *)"
+    ]
+  }
+}

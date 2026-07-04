@@ -1,0 +1,2 @@
+adb reverse tcp:60043 tcp:60043
+Setiap kali debug exec ini dulu, biar dari debug buat ke API laptop
