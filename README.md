@@ -67,3 +67,4 @@ Backend: `D:\NET\SINARA\ERP.API` (ASP.NET Core 8 + PostgreSQL), khususnya `Contr
 - **Emulator Android**: base URL di `lib/core/api_config.dart` perlu diarahkan ke `http://10.0.2.2:60043/api/v1`.
 - **HP fisik via USB**: base URL tetap `127.0.0.1`, tapi jalankan `adb reverse tcp:60043 tcp:60043` dulu supaya HP bisa "menembus" ke API di laptop lewat kabel USB. Perlu diulang tiap kali HP dicabut-pasang atau adb/laptop restart.
 - Akun ERP yang dipakai login harus terhubung ke data karyawan (`HrEmployee.UserId` terisi), kalau tidak endpoint absen akan menolak dengan pesan "No employee profile is linked to this account."
+ API reference.
