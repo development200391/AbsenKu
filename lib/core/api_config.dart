@@ -5,5 +5,5 @@ class ApiConfig {
   /// - Physical device over USB: keep `127.0.0.1` and run
   ///   `adb reverse tcp:60043 tcp:60043` so the phone's localhost:60043 tunnels
   ///   to the host machine.
-  static const String baseUrl = 'http://127.0.0.1:60043/api/v1';
+  static const String baseUrl = 'http://192.168.137.1:60043/api/v1';
 }

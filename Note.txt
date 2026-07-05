@@ -1,2 +1,7 @@
 adb reverse tcp:60043 tcp:60043
 Setiap kali debug exec ini dulu, biar dari debug buat ke API laptop
+
+
+unutuk build apk
+flutter build apk --release
+d:\Flutter\AbsenKu\build\app\outputs\flutter-apk\app-release.apk

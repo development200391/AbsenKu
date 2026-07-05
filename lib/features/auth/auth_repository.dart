@@ -24,7 +24,22 @@ class AuthRepository {
       );
       return null;
     } on DioException catch (e) {
+      if (_isConnectionFailure(e)) {
+        return 'Gagal terhubung ke server. Periksa koneksi internet/jaringan Anda.';
+      }
       return _extractErrorMessage(e) ?? 'Login gagal. Periksa username/password Anda.';
+    }
+  }
+
+  static bool _isConnectionFailure(DioException e) {
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+      case DioExceptionType.connectionError:
+        return true;
+      default:
+        return false;
     }
   }
 
