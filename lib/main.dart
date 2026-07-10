@@ -6,6 +6,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'core/api_client.dart';
 import 'core/auth_session.dart';
 import 'core/brand.dart';
+import 'core/diagnostics_reporter.dart';
 import 'core/secure_storage.dart';
 import 'features/attendance/data/attendance_repository.dart';
 import 'features/auth/auth_repository.dart';
@@ -18,9 +19,11 @@ void main() async {
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
     debugPrint('[uncaught/flutter] ${details.exceptionAsString()}\n${details.stack}');
+    DiagnosticsReporter.instance.report(details.exception, details.stack, source: 'flutter');
   };
   PlatformDispatcher.instance.onError = (error, stack) {
     debugPrint('[uncaught/platform] $error\n$stack');
+    DiagnosticsReporter.instance.report(error, stack, source: 'platform');
     return true;
   };
 

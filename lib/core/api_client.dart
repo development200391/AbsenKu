@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import 'api_config.dart';
+import 'correlation.dart';
 import 'secure_storage.dart';
 
 /// Marks a request as not needing an Authorization header and not eligible
@@ -17,6 +18,17 @@ class ApiClient {
     ));
 
     _plainDio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl));
+
+    final correlationInterceptor = InterceptorsWrapper(
+      onRequest: (options, handler) {
+        final correlationId = CorrelationContext.generate();
+        CorrelationContext.lastRequestId = correlationId;
+        options.headers['X-Correlation-Id'] = correlationId;
+        handler.next(options);
+      },
+    );
+    _dio.interceptors.add(correlationInterceptor);
+    _plainDio.interceptors.add(correlationInterceptor);
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
