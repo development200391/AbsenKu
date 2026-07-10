@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "AbsenKu",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "AbsenKu (HP - ASUS)",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "R6AIGF000566YRD"
+        },
+        {
+            "name": "AbsenKu (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "AbsenKu (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

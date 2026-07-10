@@ -5,3 +5,7 @@ Setiap kali debug exec ini dulu, biar dari debug buat ke API laptop
 unutuk build apk
 flutter build apk --release
 d:\Flutter\AbsenKu\build\app\outputs\flutter-apk\app-release.apk
+
+
+
+Cara debug di HP pake Run & Debug aja
