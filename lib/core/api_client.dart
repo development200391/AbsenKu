@@ -54,6 +54,27 @@ class ApiClient {
         }
       },
     ));
+
+    if (kDebugMode) {
+      _dio.interceptors.add(InterceptorsWrapper(
+        onResponse: (response, handler) {
+          debugPrint(
+            '[api] ${response.requestOptions.method} ${response.requestOptions.path} '
+            '-> ${response.statusCode} content-type=${response.headers.value('content-type')} '
+            'dataType=${response.data.runtimeType}',
+          );
+          handler.next(response);
+        },
+        onError: (error, handler) {
+          debugPrint(
+            '[api] ${error.requestOptions.method} ${error.requestOptions.path} '
+            '-> ERROR ${error.response?.statusCode} content-type=${error.response?.headers.value('content-type')} '
+            'dataType=${error.response?.data.runtimeType}',
+          );
+          handler.next(error);
+        },
+      ));
+    }
   }
 
   late final Dio _dio;

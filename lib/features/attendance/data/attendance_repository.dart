@@ -19,7 +19,7 @@ class AttendanceRepository {
 
   Future<AttendanceRecord?> getToday() async {
     final response = await _run(() => _apiClient.dio.get('/hr/attendance/self/today'));
-    if (response.data == null) {
+    if (response.data == null || response.data == '') {
       return null;
     }
     return AttendanceRecord.fromJson(response.data as Map<String, dynamic>);
