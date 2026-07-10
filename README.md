@@ -52,7 +52,7 @@ Sebelum karyawan bisa check-in, admin HR perlu mengisi **lokasi kantor & radius*
 ## Arsitektur Singkat
 ```
 lib/
-  core/            # koneksi API (dio + auto-refresh token), secure storage, sesi login
+  core/            # koneksi API (dio + auto-refresh token + correlation id), secure storage, sesi login, error reporting
   features/
     auth/          # login
     attendance/
@@ -61,6 +61,19 @@ lib/
       presentation/# layar Beranda, Ajukan Izin, Riwayat
 ```
 Backend: `D:\NET\SINARA\ERP.API` (ASP.NET Core 8 + PostgreSQL), khususnya `Controllers/v1/HR/SelfAttendanceController.cs` dan `Services/HR/AttendanceService.cs`.
+
+## Penanganan Error & Logging
+Supaya error yang terjadi di HP karyawan tidak "hilang begitu saja" (tidak ada console yang bisa dilihat developer), ada mekanisme berikut:
+
+**Correlation ID** — setiap request dari app ke API disertai header `X-Correlation-Id` (dibuat di `lib/core/correlation.dart`, dipasang otomatis lewat interceptor di `lib/core/api_client.dart`). Backend ikut mencatat ID ini, jadi satu request dari app bisa ditelusuri baris log-nya di server pakai ID yang sama.
+
+**Error tak tertangani (crash)** — `lib/main.dart` mendaftarkan `FlutterError.onError` (error dari framework Flutter: build/layout/gesture) dan `PlatformDispatcher.instance.onError` (error async yang lolos dari try/catch manapun). Keduanya meneruskan error ke `lib/core/diagnostics_reporter.dart`, yang:
+- Mengirim `POST /api/v1/diagnostics/client-log` (endpoint anonymous, tidak perlu login) berisi pesan error, stack trace, correlation ID baru untuk laporan ini, dan correlation ID request terakhir sebagai referensi.
+- Fire-and-forget dan dibatasi cooldown 5 menit per jenis error, supaya kegagalan kirim log atau error yang berulang-ulang tidak menambah crash baru / membanjiri log.
+
+**Sisi backend (`ERP.API`)** — semua request (termasuk `client-log` di atas) dicatat oleh `Middleware/RequestLoggingMiddleware.cs` ke file `logs/requests-{yyyy-MM-dd-HH}.txt`, kalau `RequestLogging:Enabled = true` di `appsettings.json` (aktif di development; production diaktifkan manual saat dibutuhkan). Endpoint `client-log` sendiri ada di `Controllers/v1/DiagnosticsController.cs` dan dibatasi rate limit 20 request/menit (`Program.cs`).
+
+Ini murni logging untuk memudahkan debugging — pesan error yang sudah ditampilkan ke user di tiap layar (`_errorMessage`) tidak berubah.
 
 ## Menjalankan untuk Development
 - Pastikan `ERP.API` sedang berjalan (default `http://127.0.0.1:60043`).
