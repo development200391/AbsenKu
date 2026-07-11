@@ -9,3 +9,19 @@ d:\Flutter\AbsenKu\build\app\outputs\flutter-apk\app-release.apk
 
 
 Cara debug di HP pake Run & Debug aja
+
+
+
+
+Last Promt
+D:\Flutter\AbsenKu\lib\features\attendance\presentation\mark_status_screen.dart
+
+mau diskusi dulu
+absent cuti sakit dan setengah hari
+apa bener formnya cuman ada catatan dan tanggal?
+
+apa kamu ada pemikiran lain?
+diskusi dulu
+
+
+dia bilang nga bener dan web nya juga, jadi benerin web dulu, buat Document Manager, dan approval yang proper, baru balik lagi ke Absentku
