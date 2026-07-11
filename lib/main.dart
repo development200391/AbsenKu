@@ -32,6 +32,7 @@ void main() async {
 
   await initializeDateFormatting('id_ID');
   await initializeDateFormatting('en_US');
+  await initializeDateFormatting('ja_JP');
   runApp(const AbsenKuApp());
 }
 

@@ -39,6 +39,14 @@ Future<void> showLanguagePicker(BuildContext context, LocaleController localeCon
               Navigator.of(context).pop();
             },
           ),
+          _LanguageOption(
+            label: '日本語',
+            selected: localeController.locale?.languageCode == 'ja',
+            onTap: () {
+              localeController.setLocale(const Locale('ja'));
+              Navigator.of(context).pop();
+            },
+          ),
         ],
       );
     },
