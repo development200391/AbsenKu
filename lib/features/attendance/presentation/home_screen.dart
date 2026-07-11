@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -33,10 +35,20 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isSubmitting = false;
   String? _errorMessage;
 
+  Duration _serverOffset = Duration.zero;
+  DateTime _clock = DateTime.now();
+  Timer? _clockTimer;
+
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _clockTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -49,13 +61,18 @@ class _HomeScreenState extends State<HomeScreen> {
       final results = await Future.wait([
         widget.attendanceRepository.getToday(),
         widget.attendanceRepository.getSettings(),
+        widget.attendanceRepository.getServerTime(),
       ]);
       if (!mounted) return;
+      final serverTime = results[2] as DateTime;
       setState(() {
         _today = results[0] as AttendanceRecord?;
         _settings = results[1] as AttendanceSettings;
+        _serverOffset = serverTime.difference(DateTime.now());
+        _clock = serverTime;
         _isLoading = false;
       });
+      _startClock();
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -63,6 +80,16 @@ class _HomeScreenState extends State<HomeScreen> {
         _errorMessage = e.toString();
       });
     }
+  }
+
+  void _startClock() {
+    _clockTimer?.cancel();
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() {
+        _clock = DateTime.now().add(_serverOffset);
+      });
+    });
   }
 
   Future<void> _handleCheckInOut({required bool isCheckIn}) async {
@@ -133,6 +160,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(DateTime.now())),
+                          const SizedBox(height: 4),
+                          Text(
+                            DateFormat('HH:mm:ss').format(_clock),
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
                           const SizedBox(height: 12),
                           _buildTimeRow('Check-in', _today?.checkIn),
                           const SizedBox(height: 8),

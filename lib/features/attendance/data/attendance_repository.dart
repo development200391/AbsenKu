@@ -39,6 +39,12 @@ class AttendanceRepository {
     return AttendanceSettings.fromJson(response.data as Map<String, dynamic>);
   }
 
+  Future<DateTime> getServerTime() async {
+    final response = await _run(() => _apiClient.dio.get('/diagnostics/server-time'));
+    final data = response.data as Map<String, dynamic>;
+    return DateTime.parse(data['serverTime'] as String).toLocal();
+  }
+
   Future<AttendanceRecord> checkIn({required double latitude, required double longitude}) async {
     final response = await _run(() => _apiClient.dio.post('/hr/attendance/self/check-in', data: {
           'latitude': latitude,
