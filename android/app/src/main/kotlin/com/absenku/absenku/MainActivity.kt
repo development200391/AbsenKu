@@ -1,5 +1,7 @@
 package com.absenku.absenku
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity : FlutterActivity()
+// local_auth (biometric login) requires the host activity to be a
+// FlutterFragmentActivity.
+class MainActivity : FlutterFragmentActivity()

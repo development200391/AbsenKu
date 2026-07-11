@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/api_client.dart';
 import 'core/auth_session.dart';
+import 'core/biometric_auth_service.dart';
 import 'core/brand.dart';
 import 'core/diagnostics_reporter.dart';
 import 'core/secure_storage.dart';
@@ -44,6 +45,7 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
   late final ApiClient _apiClient;
   late final AuthRepository _authRepository;
   late final AttendanceRepository _attendanceRepository;
+  late final BiometricAuthService _biometricAuthService;
   late final GoRouter _router;
 
   @override
@@ -53,6 +55,7 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
     _apiClient = ApiClient(_storage, onSessionExpired: _authSession.logout);
     _authRepository = AuthRepository(_apiClient, _storage);
     _attendanceRepository = AttendanceRepository(_apiClient);
+    _biometricAuthService = BiometricAuthService();
 
     _router = GoRouter(
       refreshListenable: _authSession,
@@ -60,7 +63,11 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
       routes: [
         GoRoute(
           path: '/login',
-          builder: (context, state) => LoginScreen(authRepository: _authRepository, authSession: _authSession),
+          builder: (context, state) => LoginScreen(
+            authRepository: _authRepository,
+            authSession: _authSession,
+            biometricAuthService: _biometricAuthService,
+          ),
         ),
         GoRoute(
           path: '/',

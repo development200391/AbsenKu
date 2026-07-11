@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>AbsenKu memerlukan lokasi untuk memverifikasi jarak Anda ke kantor saat absen.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>AbsenKu menggunakan Face ID untuk membuka sesi login Anda dengan aman.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
