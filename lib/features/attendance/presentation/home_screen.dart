@@ -225,18 +225,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildActionButton() {
     final hasCheckedIn = _today?.checkIn != null;
     final hasCheckedOut = _today?.checkOut != null;
-
-    if (hasCheckedIn && hasCheckedOut) {
-      return const FilledButton(onPressed: null, child: Text('Selesai hari ini'));
-    }
-
     final isCheckIn = !hasCheckedIn;
 
     return FilledButton.icon(
       icon: _isSubmitting
           ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
           : Icon(isCheckIn ? Icons.login : Icons.logout),
-      label: Text(isCheckIn ? 'Check In' : 'Check Out'),
+      label: Text(isCheckIn ? 'Check In' : (hasCheckedOut ? 'Perbarui Check Out' : 'Check Out')),
       onPressed: _isSubmitting ? null : () => _handleCheckInOut(isCheckIn: isCheckIn),
     );
   }
