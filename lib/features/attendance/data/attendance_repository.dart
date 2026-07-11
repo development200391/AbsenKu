@@ -1,16 +1,8 @@
 import 'package:dio/dio.dart';
 
 import '../../../core/api_client.dart';
+import '../../../core/api_exception.dart';
 import '../models/attendance_models.dart';
-
-class ApiException implements Exception {
-  ApiException(this.message);
-
-  final String message;
-
-  @override
-  String toString() => message;
-}
 
 class AttendanceRepository {
   AttendanceRepository(this._apiClient);
@@ -78,7 +70,7 @@ class AttendanceRepository {
     try {
       return await request();
     } on DioException catch (e) {
-      throw ApiException(_extractErrorMessage(e) ?? 'Terjadi kesalahan. Coba lagi.');
+      throw mapDioException(e);
     }
   }
 
@@ -87,13 +79,5 @@ class AttendanceRepository {
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
     return '$year-$month-$day';
-  }
-
-  static String? _extractErrorMessage(DioException e) {
-    final data = e.response?.data;
-    if (data is Map && data['message'] is String) {
-      return data['message'] as String;
-    }
-    return null;
   }
 }

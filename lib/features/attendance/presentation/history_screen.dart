@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/api_exception.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/attendance_repository.dart';
 import '../models/attendance_models.dart';
 
@@ -24,8 +26,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Riwayat Absensi')),
+      appBar: AppBar(title: Text(l10n.historyTitle)),
       body: FutureBuilder<List<AttendanceRecord>>(
         future: _future,
         builder: (context, snapshot) {
@@ -34,12 +39,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('${snapshot.error}'));
+            final error = snapshot.error;
+            final message = switch (error) {
+              ConnectionException() => l10n.connectionErrorMessage,
+              ApiException(message: final message) => message,
+              _ => l10n.genericErrorMessage,
+            };
+            return Center(child: Text(message));
           }
 
           final records = snapshot.data ?? [];
           if (records.isEmpty) {
-            return const Center(child: Text('Belum ada riwayat.'));
+            return Center(child: Text(l10n.noHistory));
           }
 
           return ListView.separated(
@@ -48,12 +59,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
             itemBuilder: (context, index) {
               final record = records[index];
               return ListTile(
-                title: Text(DateFormat('EEEE, d MMMM yyyy').format(record.date)),
-                subtitle: Text(
-                  'In: ${record.checkIn == null ? '-' : DateFormat('HH:mm').format(record.checkIn!)}   '
-                  'Out: ${record.checkOut == null ? '-' : DateFormat('HH:mm').format(record.checkOut!)}',
-                ),
-                trailing: Text(record.status.label),
+                title: Text(DateFormat('EEEE, d MMMM yyyy', locale).format(record.date)),
+                subtitle: Text(l10n.attendanceSummary(
+                  record.checkIn == null ? '-' : DateFormat('HH:mm').format(record.checkIn!),
+                  record.checkOut == null ? '-' : DateFormat('HH:mm').format(record.checkOut!),
+                )),
+                trailing: Text(record.status.label(context)),
               );
             },
           );

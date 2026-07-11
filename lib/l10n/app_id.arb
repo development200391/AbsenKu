@@ -1,0 +1,123 @@
+{
+  "@@locale": "id",
+
+  "usernameLabel": "Username",
+  "@usernameLabel": {"description": "Label for the username field on the login form"},
+
+  "passwordLabel": "Password",
+  "@passwordLabel": {"description": "Label for the password field on the login form"},
+
+  "usernameRequired": "Username wajib diisi",
+  "@usernameRequired": {"description": "Validation error when username is empty"},
+
+  "passwordRequired": "Password wajib diisi",
+  "@passwordRequired": {"description": "Validation error when password is empty"},
+
+  "loginButton": "Login",
+  "@loginButton": {"description": "Submit button on the login form"},
+
+  "unlockSubtitle": "Sesi Anda masih tersimpan. Verifikasi untuk melanjutkan.",
+  "@unlockSubtitle": {"description": "Subtitle shown on the biometric unlock gate"},
+
+  "biometricFailed": "Verifikasi biometrik gagal atau dibatalkan.",
+  "@biometricFailed": {"description": "Shown when biometric authentication fails or is cancelled"},
+
+  "unlockWithBiometricButton": "Buka dengan Sidik Jari / Face ID",
+  "@unlockWithBiometricButton": {"description": "Button that triggers biometric authentication"},
+
+  "loginWithPasswordButton": "Login dengan Password",
+  "@loginWithPasswordButton": {"description": "Link that switches from the biometric gate to the password form"},
+
+  "backToBiometricButton": "Kembali ke verifikasi biometrik",
+  "@backToBiometricButton": {"description": "Link that switches back from the password form to the biometric gate"},
+
+  "historyTooltip": "Riwayat",
+  "@historyTooltip": {"description": "Tooltip for the history icon button on the home screen app bar"},
+
+  "logoutTooltip": "Logout",
+  "@logoutTooltip": {"description": "Tooltip for the logout icon button on the home screen app bar"},
+
+  "checkIn": "Check In",
+  "@checkIn": {"description": "Label/button for the check-in action"},
+
+  "checkOut": "Check Out",
+  "@checkOut": {"description": "Label/button for the check-out action"},
+
+  "updateCheckOutButton": "Perbarui Check Out",
+  "@updateCheckOutButton": {"description": "Button label when checking out again to revise the recorded time"},
+
+  "statusLine": "Status: {status}",
+  "@statusLine": {
+    "description": "Line showing today's attendance status",
+    "placeholders": {"status": {"type": "String"}}
+  },
+
+  "officeLocationNotConfigured": "Lokasi kantor belum diatur oleh admin. Hubungi HR.",
+  "@officeLocationNotConfigured": {"description": "Warning shown when the office location has not been configured"},
+
+  "requestLeaveButton": "Ajukan Izin / Sakit / Cuti / Setengah Hari",
+  "@requestLeaveButton": {"description": "Button that opens the mark-status screen"},
+
+  "markStatusTitle": "Ajukan Izin",
+  "@markStatusTitle": {"description": "App bar title for the mark-status screen"},
+
+  "dateLabel": "Tanggal",
+  "@dateLabel": {"description": "Label for the date picker field"},
+
+  "typeLabel": "Jenis",
+  "@typeLabel": {"description": "Label for the attendance-status dropdown"},
+
+  "notesLabel": "Catatan (opsional)",
+  "@notesLabel": {"description": "Label for the optional notes field"},
+
+  "submitButton": "Kirim",
+  "@submitButton": {"description": "Submit button on the mark-status form"},
+
+  "historyTitle": "Riwayat Absensi",
+  "@historyTitle": {"description": "App bar title for the history screen"},
+
+  "noHistory": "Belum ada riwayat.",
+  "@noHistory": {"description": "Shown when there is no attendance history yet"},
+
+  "attendanceSummary": "In: {checkIn}   Out: {checkOut}",
+  "@attendanceSummary": {
+    "description": "Check-in/check-out time summary line in the history list",
+    "placeholders": {
+      "checkIn": {"type": "String"},
+      "checkOut": {"type": "String"}
+    }
+  },
+
+  "statusPresent": "Hadir",
+  "@statusPresent": {"description": "Attendance status: present"},
+
+  "statusAbsent": "Absen",
+  "@statusAbsent": {"description": "Attendance status: absent"},
+
+  "statusLate": "Terlambat",
+  "@statusLate": {"description": "Attendance status: late"},
+
+  "statusHalfDay": "Setengah Hari",
+  "@statusHalfDay": {"description": "Attendance status: half day"},
+
+  "statusSick": "Sakit",
+  "@statusSick": {"description": "Attendance status: sick leave"},
+
+  "statusLeave": "Cuti",
+  "@statusLeave": {"description": "Attendance status: annual/paid leave"},
+
+  "locationServiceDisabled": "Aktifkan layanan lokasi (GPS) terlebih dahulu.",
+  "@locationServiceDisabled": {"description": "Shown when the device's location service is turned off"},
+
+  "locationPermissionDenied": "Izin lokasi ditolak. Aktifkan izin lokasi di pengaturan aplikasi.",
+  "@locationPermissionDenied": {"description": "Shown when the app is denied location permission"},
+
+  "connectionErrorMessage": "Gagal terhubung ke server. Periksa koneksi internet/jaringan Anda.",
+  "@connectionErrorMessage": {"description": "Shown when a request fails due to no/unstable network connection"},
+
+  "genericErrorMessage": "Terjadi kesalahan. Coba lagi.",
+  "@genericErrorMessage": {"description": "Fallback shown when a request fails without a specific server message"},
+
+  "loginGenericError": "Login gagal. Periksa username/password Anda.",
+  "@loginGenericError": {"description": "Fallback shown when login fails without a specific server message"}
+}

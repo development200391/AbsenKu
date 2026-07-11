@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/api_exception.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/attendance_repository.dart';
 import '../models/attendance_models.dart';
 
@@ -54,17 +56,24 @@ class _MarkStatusScreenState extends State<MarkStatusScreen> {
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
         _isSubmitting = false;
-        _errorMessage = e.toString();
+        _errorMessage = switch (e) {
+          ConnectionException() => l10n.connectionErrorMessage,
+          ApiException(message: final message) => message,
+          _ => l10n.genericErrorMessage,
+        };
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Ajukan Izin')),
+      appBar: AppBar(title: Text(l10n.markStatusTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -72,17 +81,17 @@ class _MarkStatusScreenState extends State<MarkStatusScreen> {
           children: [
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Tanggal'),
-              subtitle: Text(DateFormat('d MMMM yyyy').format(_date)),
+              title: Text(l10n.dateLabel),
+              subtitle: Text(DateFormat('d MMMM yyyy', Localizations.localeOf(context).toString()).format(_date)),
               trailing: const Icon(Icons.calendar_today),
               onTap: _pickDate,
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<AttendanceStatus>(
               initialValue: _status,
-              decoration: const InputDecoration(labelText: 'Jenis', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: l10n.typeLabel, border: const OutlineInputBorder()),
               items: selfReportableStatuses
-                  .map((status) => DropdownMenuItem(value: status, child: Text(status.label)))
+                  .map((status) => DropdownMenuItem(value: status, child: Text(status.label(context))))
                   .toList(),
               onChanged: (value) {
                 if (value != null) {
@@ -93,7 +102,7 @@ class _MarkStatusScreenState extends State<MarkStatusScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: _notesController,
-              decoration: const InputDecoration(labelText: 'Catatan (opsional)', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: l10n.notesLabel, border: const OutlineInputBorder()),
               maxLines: 3,
             ),
             if (_errorMessage != null) ...[
@@ -105,7 +114,7 @@ class _MarkStatusScreenState extends State<MarkStatusScreen> {
               onPressed: _isSubmitting ? null : _submit,
               child: _isSubmitting
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text('Kirim'),
+                  : Text(l10n.submitButton),
             ),
           ],
         ),

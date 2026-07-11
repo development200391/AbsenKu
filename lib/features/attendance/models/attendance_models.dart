@@ -1,3 +1,7 @@
+import 'package:flutter/widgets.dart';
+
+import '../../../l10n/app_localizations.dart';
+
 enum AttendanceStatus {
   present(0),
   absent(1),
@@ -14,20 +18,21 @@ enum AttendanceStatus {
     return AttendanceStatus.values.firstWhere((status) => status.value == value, orElse: () => AttendanceStatus.present);
   }
 
-  String get label {
+  String label(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (this) {
       case AttendanceStatus.present:
-        return 'Hadir';
+        return l10n.statusPresent;
       case AttendanceStatus.absent:
-        return 'Absen';
+        return l10n.statusAbsent;
       case AttendanceStatus.late_:
-        return 'Terlambat';
+        return l10n.statusLate;
       case AttendanceStatus.halfDay:
-        return 'Setengah Hari';
+        return l10n.statusHalfDay;
       case AttendanceStatus.sick:
-        return 'Sakit';
+        return l10n.statusSick;
       case AttendanceStatus.cuti:
-        return 'Cuti';
+        return l10n.statusLeave;
     }
   }
 }

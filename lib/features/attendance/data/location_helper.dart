@@ -1,17 +1,20 @@
 import 'package:geolocator/geolocator.dart';
 
-class LocationException implements Exception {
-  LocationException(this.message);
+/// The device's location service (GPS) is turned off. Client-side and
+/// translatable — see [AppLocalizations.locationServiceDisabled].
+class LocationServiceDisabledException implements Exception {
+  const LocationServiceDisabledException();
+}
 
-  final String message;
-
-  @override
-  String toString() => message;
+/// The app was denied location permission. Client-side and translatable —
+/// see [AppLocalizations.locationPermissionDenied].
+class LocationPermissionDeniedException implements Exception {
+  const LocationPermissionDeniedException();
 }
 
 Future<Position> getCurrentPosition() async {
   if (!await Geolocator.isLocationServiceEnabled()) {
-    throw LocationException('Aktifkan layanan lokasi (GPS) terlebih dahulu.');
+    throw const LocationServiceDisabledException();
   }
 
   var permission = await Geolocator.checkPermission();
@@ -20,7 +23,7 @@ Future<Position> getCurrentPosition() async {
   }
 
   if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-    throw LocationException('Izin lokasi ditolak. Aktifkan izin lokasi di pengaturan aplikasi.');
+    throw const LocationPermissionDeniedException();
   }
 
   return Geolocator.getCurrentPosition(

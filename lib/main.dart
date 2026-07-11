@@ -13,6 +13,7 @@ import 'features/attendance/data/attendance_repository.dart';
 import 'features/auth/auth_repository.dart';
 import 'features/auth/login_screen.dart';
 import 'features/attendance/presentation/home_screen.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,7 @@ void main() async {
   };
 
   await initializeDateFormatting('id_ID');
+  await initializeDateFormatting('en_US');
   runApp(const AbsenKuApp());
 }
 
@@ -108,6 +110,8 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
 
         return MaterialApp.router(
           title: 'AbsenKu',
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Brand.seed),
             useMaterial3: true,

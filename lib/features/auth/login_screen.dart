@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../core/api_exception.dart';
 import '../../core/auth_session.dart';
 import '../../core/biometric_auth_service.dart';
 import '../../core/brand.dart';
+import '../../l10n/app_localizations.dart';
 import 'auth_repository.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -80,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() {
       _isUnlocking = false;
-      _errorMessage = 'Verifikasi biometrik gagal atau dibatalkan.';
+      _errorMessage = AppLocalizations.of(context)!.biometricFailed;
     });
   }
 
@@ -94,23 +96,37 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = null;
     });
 
-    final error = await widget.authRepository.login(
-      _usernameController.text.trim(),
-      _passwordController.text,
-    );
+    final l10n = AppLocalizations.of(context)!;
 
-    if (!mounted) {
-      return;
-    }
-
-    if (error != null) {
+    try {
+      await widget.authRepository.login(
+        _usernameController.text.trim(),
+        _passwordController.text,
+      );
+    } on ConnectionException {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _errorMessage = error;
+        _errorMessage = l10n.connectionErrorMessage;
+      });
+      return;
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage = e.message;
+      });
+      return;
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage = l10n.loginGenericError;
       });
       return;
     }
 
+    if (!mounted) return;
     widget.authSession.markAuthenticated();
   }
 
@@ -124,6 +140,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildUnlockGate(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -141,10 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Sesi Anda masih tersimpan. Verifikasi untuk melanjutkan.',
-              textAlign: TextAlign.center,
-            ),
+            Text(l10n.unlockSubtitle, textAlign: TextAlign.center),
             const SizedBox(height: 32),
             if (_errorMessage != null) ...[
               Text(_errorMessage!, textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).colorScheme.error)),
@@ -154,13 +169,13 @@ class _LoginScreenState extends State<LoginScreen> {
               icon: _isUnlocking
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                   : const Icon(Icons.fingerprint),
-              label: const Text('Buka dengan Sidik Jari / Face ID'),
+              label: Text(l10n.unlockWithBiometricButton),
               onPressed: _isUnlocking ? null : _unlockWithBiometric,
             ),
             const SizedBox(height: 12),
             TextButton(
               onPressed: _isUnlocking ? null : () => setState(() => _showPasswordForm = true),
-              child: const Text('Login dengan Password'),
+              child: Text(l10n.loginWithPasswordButton),
             ),
           ],
         ),
@@ -169,6 +184,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildPasswordForm(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -191,16 +208,16 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 32),
               TextFormField(
                 controller: _usernameController,
-                decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
-                validator: (value) => (value == null || value.trim().isEmpty) ? 'Username wajib diisi' : null,
+                decoration: InputDecoration(labelText: l10n.usernameLabel, border: const OutlineInputBorder()),
+                validator: (value) => (value == null || value.trim().isEmpty) ? l10n.usernameRequired : null,
                 textInputAction: TextInputAction.next,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: l10n.passwordLabel, border: const OutlineInputBorder()),
                 obscureText: true,
-                validator: (value) => (value == null || value.isEmpty) ? 'Password wajib diisi' : null,
+                validator: (value) => (value == null || value.isEmpty) ? l10n.passwordRequired : null,
                 onFieldSubmitted: (_) => _submit(),
               ),
               if (_errorMessage != null) ...[
@@ -212,13 +229,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: _isLoading ? null : _submit,
                 child: _isLoading
                     ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Text('Login'),
+                    : Text(l10n.loginButton),
               ),
               if (widget.authSession.hasStoredSession) ...[
                 const SizedBox(height: 12),
                 TextButton(
                   onPressed: _isLoading ? null : () => setState(() => _showPasswordForm = false),
-                  child: const Text('Kembali ke verifikasi biometrik'),
+                  child: Text(l10n.backToBiometricButton),
                 ),
               ],
             ],

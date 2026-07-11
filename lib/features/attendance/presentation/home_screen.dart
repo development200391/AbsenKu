@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/api_exception.dart';
 import '../../../core/auth_session.dart';
 import '../../../core/brand.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/auth_repository.dart';
 import '../data/attendance_repository.dart';
 import '../data/location_helper.dart';
@@ -51,6 +53,15 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  String _describeError(Object error) {
+    final l10n = AppLocalizations.of(context)!;
+    if (error is ConnectionException) return l10n.connectionErrorMessage;
+    if (error is ApiException) return error.message;
+    if (error is LocationServiceDisabledException) return l10n.locationServiceDisabled;
+    if (error is LocationPermissionDeniedException) return l10n.locationPermissionDenied;
+    return l10n.genericErrorMessage;
+  }
+
   Future<void> _load() async {
     setState(() {
       _isLoading = true;
@@ -77,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _errorMessage = e.toString();
+        _errorMessage = _describeError(e);
       });
     }
   }
@@ -113,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       setState(() {
         _isSubmitting = false;
-        _errorMessage = e.toString();
+        _errorMessage = _describeError(e);
       });
     }
   }
@@ -125,6 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
+
     return Scaffold(
       appBar: AppBar(
         title: const Row(
@@ -138,12 +152,12 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
-            tooltip: 'Riwayat',
+            tooltip: l10n.historyTooltip,
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => HistoryScreen(attendanceRepository: widget.attendanceRepository),
             )),
           ),
-          IconButton(icon: const Icon(Icons.logout), tooltip: 'Logout', onPressed: _logout),
+          IconButton(icon: const Icon(Icons.logout), tooltip: l10n.logoutTooltip, onPressed: _logout),
         ],
       ),
       body: RefreshIndicator(
@@ -159,24 +173,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(DateTime.now())),
+                          Text(DateFormat('EEEE, d MMMM yyyy', locale).format(DateTime.now())),
                           const SizedBox(height: 4),
                           Text(
                             DateFormat('HH:mm:ss').format(_clock),
                             style: Theme.of(context).textTheme.headlineMedium,
                           ),
                           const SizedBox(height: 12),
-                          _buildTimeRow('Check-in', _today?.checkIn),
+                          _buildTimeRow(l10n.checkIn, _today?.checkIn),
                           const SizedBox(height: 8),
-                          _buildTimeRow('Check-out', _today?.checkOut),
+                          _buildTimeRow(l10n.checkOut, _today?.checkOut),
                           if (_today != null) ...[
                             const SizedBox(height: 8),
-                            Text('Status: ${_today!.status.label}'),
+                            Text(l10n.statusLine(_today!.status.label(context))),
                           ],
                           if (_settings != null && !_settings!.isOfficeLocationConfigured) ...[
                             const SizedBox(height: 12),
                             Text(
-                              'Lokasi kantor belum diatur oleh admin. Hubungi HR.',
+                              l10n.officeLocationNotConfigured,
                               style: TextStyle(color: Theme.of(context).colorScheme.error),
                             ),
                           ],
@@ -190,11 +204,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Text(_errorMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                     ),
-                  _buildActionButton(),
+                  _buildActionButton(l10n),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
                     icon: const Icon(Icons.event_busy_outlined),
-                    label: const Text('Ajukan Izin / Sakit / Cuti / Setengah Hari'),
+                    label: Text(l10n.requestLeaveButton),
                     onPressed: _isSubmitting
                         ? null
                         : () async {
@@ -222,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildActionButton() {
+  Widget _buildActionButton(AppLocalizations l10n) {
     final hasCheckedIn = _today?.checkIn != null;
     final hasCheckedOut = _today?.checkOut != null;
     final isCheckIn = !hasCheckedIn;
@@ -231,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
       icon: _isSubmitting
           ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
           : Icon(isCheckIn ? Icons.login : Icons.logout),
-      label: Text(isCheckIn ? 'Check In' : (hasCheckedOut ? 'Perbarui Check Out' : 'Check Out')),
+      label: Text(isCheckIn ? l10n.checkIn : (hasCheckedOut ? l10n.updateCheckOutButton : l10n.checkOut)),
       onPressed: _isSubmitting ? null : () => _handleCheckInOut(isCheckIn: isCheckIn),
     );
   }
