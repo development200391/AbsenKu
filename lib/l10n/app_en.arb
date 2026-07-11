@@ -37,5 +37,8 @@
   "locationPermissionDenied": "Location permission denied. Enable it in the app settings.",
   "connectionErrorMessage": "Failed to connect to the server. Check your internet/network connection.",
   "genericErrorMessage": "Something went wrong. Please try again.",
-  "loginGenericError": "Login failed. Check your username/password."
+  "loginGenericError": "Login failed. Check your username/password.",
+  "languageTooltip": "Language",
+  "chooseLanguageTitle": "Choose Language",
+  "systemDefaultLanguage": "Follow System Language"
 }

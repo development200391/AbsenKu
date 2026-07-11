@@ -8,6 +8,7 @@ import 'core/auth_session.dart';
 import 'core/biometric_auth_service.dart';
 import 'core/brand.dart';
 import 'core/diagnostics_reporter.dart';
+import 'core/locale_controller.dart';
 import 'core/secure_storage.dart';
 import 'features/attendance/data/attendance_repository.dart';
 import 'features/auth/auth_repository.dart';
@@ -44,6 +45,7 @@ class AbsenKuApp extends StatefulWidget {
 class _AbsenKuAppState extends State<AbsenKuApp> {
   final _storage = const SecureStorageService();
   late final AuthSession _authSession;
+  late final LocaleController _localeController;
   late final ApiClient _apiClient;
   late final AuthRepository _authRepository;
   late final AttendanceRepository _attendanceRepository;
@@ -54,6 +56,7 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
   void initState() {
     super.initState();
     _authSession = AuthSession(_storage);
+    _localeController = LocaleController(_storage);
     _apiClient = ApiClient(_storage, onSessionExpired: _authSession.logout);
     _authRepository = AuthRepository(_apiClient, _storage);
     _attendanceRepository = AttendanceRepository(_apiClient);
@@ -69,6 +72,7 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
             authRepository: _authRepository,
             authSession: _authSession,
             biometricAuthService: _biometricAuthService,
+            localeController: _localeController,
           ),
         ),
         GoRoute(
@@ -77,6 +81,7 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
             attendanceRepository: _attendanceRepository,
             authRepository: _authRepository,
             authSession: _authSession,
+            localeController: _localeController,
           ),
         ),
       ],
@@ -97,12 +102,13 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
     );
 
     _authSession.restore();
+    _localeController.restore();
   }
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: _authSession,
+      listenable: Listenable.merge([_authSession, _localeController]),
       builder: (context, _) {
         if (_authSession.isInitializing) {
           return const MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));
@@ -110,6 +116,7 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
 
         return MaterialApp.router(
           title: 'AbsenKu',
+          locale: _localeController.locale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           theme: ThemeData(

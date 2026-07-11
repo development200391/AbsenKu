@@ -128,4 +128,13 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get loginGenericError =>
       'Login gagal. Periksa username/password Anda.';
+
+  @override
+  String get languageTooltip => 'Bahasa';
+
+  @override
+  String get chooseLanguageTitle => 'Pilih Bahasa';
+
+  @override
+  String get systemDefaultLanguage => 'Ikuti Bahasa Sistem';
 }

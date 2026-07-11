@@ -4,6 +4,8 @@ import '../../core/api_exception.dart';
 import '../../core/auth_session.dart';
 import '../../core/biometric_auth_service.dart';
 import '../../core/brand.dart';
+import '../../core/language_picker.dart';
+import '../../core/locale_controller.dart';
 import '../../l10n/app_localizations.dart';
 import 'auth_repository.dart';
 
@@ -13,11 +15,13 @@ class LoginScreen extends StatefulWidget {
     required this.authRepository,
     required this.authSession,
     required this.biometricAuthService,
+    required this.localeController,
   });
 
   final AuthRepository authRepository;
   final AuthSession authSession;
   final BiometricAuthService biometricAuthService;
+  final LocaleController localeController;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -132,9 +136,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: SafeArea(
-        child: _showPasswordForm ? _buildPasswordForm(context) : _buildUnlockGate(context),
+        child: Stack(
+          children: [
+            _showPasswordForm ? _buildPasswordForm(context) : _buildUnlockGate(context),
+            Positioned(
+              top: 4,
+              right: 4,
+              child: IconButton(
+                icon: const Icon(Icons.language),
+                tooltip: l10n.languageTooltip,
+                onPressed: () => showLanguagePicker(context, widget.localeController),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -319,6 +319,24 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Login gagal. Periksa username/password Anda.'**
   String get loginGenericError;
+
+  /// Tooltip for the language-picker icon button
+  ///
+  /// In id, this message translates to:
+  /// **'Bahasa'**
+  String get languageTooltip;
+
+  /// Title of the language-picker dialog
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih Bahasa'**
+  String get chooseLanguageTitle;
+
+  /// Option to follow the device's system language instead of a fixed one
+  ///
+  /// In id, this message translates to:
+  /// **'Ikuti Bahasa Sistem'**
+  String get systemDefaultLanguage;
 }
 
 class _AppLocalizationsDelegate

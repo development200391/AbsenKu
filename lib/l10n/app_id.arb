@@ -119,5 +119,14 @@
   "@genericErrorMessage": {"description": "Fallback shown when a request fails without a specific server message"},
 
   "loginGenericError": "Login gagal. Periksa username/password Anda.",
-  "@loginGenericError": {"description": "Fallback shown when login fails without a specific server message"}
+  "@loginGenericError": {"description": "Fallback shown when login fails without a specific server message"},
+
+  "languageTooltip": "Bahasa",
+  "@languageTooltip": {"description": "Tooltip for the language-picker icon button"},
+
+  "chooseLanguageTitle": "Pilih Bahasa",
+  "@chooseLanguageTitle": {"description": "Title of the language-picker dialog"},
+
+  "systemDefaultLanguage": "Ikuti Bahasa Sistem",
+  "@systemDefaultLanguage": {"description": "Option to follow the device's system language instead of a fixed one"}
 }

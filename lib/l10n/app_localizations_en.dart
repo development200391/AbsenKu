@@ -128,4 +128,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginGenericError => 'Login failed. Check your username/password.';
+
+  @override
+  String get languageTooltip => 'Language';
+
+  @override
+  String get chooseLanguageTitle => 'Choose Language';
+
+  @override
+  String get systemDefaultLanguage => 'Follow System Language';
 }

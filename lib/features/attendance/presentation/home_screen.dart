@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import '../../../core/api_exception.dart';
 import '../../../core/auth_session.dart';
 import '../../../core/brand.dart';
+import '../../../core/language_picker.dart';
+import '../../../core/locale_controller.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/auth_repository.dart';
 import '../data/attendance_repository.dart';
@@ -20,11 +22,13 @@ class HomeScreen extends StatefulWidget {
     required this.attendanceRepository,
     required this.authRepository,
     required this.authSession,
+    required this.localeController,
   });
 
   final AttendanceRepository attendanceRepository;
   final AuthRepository authRepository;
   final AuthSession authSession;
+  final LocaleController localeController;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -150,6 +154,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            tooltip: l10n.languageTooltip,
+            onPressed: () => showLanguagePicker(context, widget.localeController),
+          ),
           IconButton(
             icon: const Icon(Icons.history),
             tooltip: l10n.historyTooltip,
