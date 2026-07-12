@@ -35,23 +35,33 @@ Status kehadiran (Hadir/Terlambat, dst) **tidak** dihitung otomatis dari jam che
 
 **Jam server (server-time)** — jam yang tampil di Beranda diambil sekali lewat `GET /api/v1/diagnostics/server-time` saat layar dibuka, lalu app menghitung selisih (offset) ke jam HP dan menjalankan jam itu sendiri di client (tick tiap detik) tanpa perlu polling server terus-menerus. Kalau jam HP diubah user setelah offset dihitung, tampilan tetap akurat karena berbasis offset, bukan jam HP mentah.
 
-### 3. Ajukan Izin / Sakit / Cuti / Setengah Hari
-Diakses lewat tombol "Ajukan Izin..." di Beranda. Dipakai kalau karyawan **tidak** melakukan check-in/check-out normal hari itu, tapi perlu mencatatkan alasan:
+### 3. Ajukan Absen / Setengah Hari
+Diakses lewat tombol "Ajukan Absen / Setengah Hari" di Beranda. Dipakai kalau karyawan **tidak** melakukan check-in/check-out normal hari itu, tapi cuma perlu koreksi/laporan status hari itu juga (bukan pengajuan resmi yang butuh persetujuan atasan):
 - Pilih tanggal (default hari ini, bisa mundur/maju).
-- Pilih jenis: **Setengah Hari, Sakit, Cuti,** atau **Absen**.
+- Pilih jenis: **Setengah Hari** atau **Absen** saja (Sakit dan Cuti sudah dipindah ke menu terpisah, lihat poin 4 — dulu keempatnya ada di sini dalam satu dropdown, tapi itu membuat karyawan bisa "Cuti" tanpa approval/kuota sama sekali).
 - Catatan opsional (alasan singkat).
-- Kirim → langsung tersimpan sebagai status hari itu, **tanpa proses approval** (beda dengan modul Leave/Cuti di ERP Web yang butuh persetujuan HR — ini disengaja dibuat simpel untuk versi awal).
+- Kirim → langsung tersimpan sebagai status hari itu, **tanpa proses approval** (disengaja dibuat simpel, karena ini murni koreksi 1 hari, bukan pengajuan cuti resmi).
 - Tidak bisa dipakai untuk tanggal yang sudah ada check-in/check-out di hari itu (dianggap konflik).
 - Endpoint: `POST /api/v1/hr/attendance/self/mark`.
 
-### 4. Riwayat Absensi (History)
+### 4. Ajukan Cuti / Sakit
+Diakses lewat tombol "Ajukan Cuti / Sakit" di Beranda — terpisah dari menu Absen/Setengah Hari (poin 3) karena alurnya beda total: ini pengajuan resmi yang butuh persetujuan atasan/HR dan dipotong dari kuota cuti tahunan, sama seperti modul Leave Requests di ERP Web.
+- Pilih **jenis cuti** (dari master Leave Type di ERP Web, mis. Cuti Tahunan/Sakit/Cuti Tanpa Bayar).
+- Pilih **rentang tanggal** (tanggal mulai s/d selesai — beda dari menu Absen yang cuma 1 hari) lewat date-range picker.
+- Alasan opsional.
+- Kirim → status jadi **Menunggu (Pending)**, belum resmi sampai disetujui HR/atasan lewat ERP Web (*HR → Leave → Requests*). Kalau ditolak melebihi kuota jenis cuti tersebut untuk tahun berjalan, submit akan gagal dengan pesan error dari server.
+- Begitu disetujui, tanggal-tanggal dalam rentang tersebut otomatis tercatat di Attendance (sinkron dari server, karyawan tidak perlu apa-apa lagi).
+- Ada ikon riwayat (🕐) di pojok kanan atas layar ini untuk melihat status semua pengajuan cuti yang pernah dibuat (Menunggu/Disetujui/Ditolak).
+- Endpoint: `GET/POST /api/v1/hr/leave-requests/self`, `GET /api/v1/hr/leave-requests/self/leave-types`.
+
+### 5. Riwayat Absensi (History)
 Diakses lewat ikon jam di pojok kanan atas Beranda. Menampilkan daftar semua catatan absensi karyawan yang login: tanggal, jam check-in/out, dan status — untuk melihat rekap tanpa perlu buka ERP Web.
 - Endpoint: `GET /api/v1/hr/attendance/self/history`.
 
-### 5. Logout
+### 6. Logout
 Ikon logout di pojok kanan atas Beranda. Menghapus token yang tersimpan di HP dan memberitahu server untuk mencabut refresh token tersebut.
 
-### 6. Bahasa (Language)
+### 7. Bahasa (Language)
 Ikon globe (🌐) di Beranda maupun layar Login membuka dialog pilih bahasa: **Ikuti Bahasa Sistem** (default, ikut setting HP), **Bahasa Indonesia**, **English**, atau **日本語**. Pilihan disimpan di HP secara terpisah dari sesi login — jadi **tidak ikut terhapus saat logout**, dan tetap kepakai walau app di-restart.
 - Semua teks UI (label, tombol, pesan validasi, dll) diterjemahkan lewat `flutter_localizations` + file ARB (`lib/l10n/app_id.arb`, `app_en.arb`, `app_ja.arb`). Format tanggal (nama hari/bulan) ikut menyesuaikan bahasa yang aktif.
 - **Yang tidak ikut diterjemahkan**: pesan error yang datang langsung dari API (field `message` di response gagal, mis. validasi jarak kantor atau error login) — itu ditampilkan apa adanya sesuai bahasa yang ditulis di backend, karena `ERP.API` sendiri belum punya mekanisme multi-bahasa untuk pesan error. Hanya pesan client-side (koneksi gagal, validasi form, dll) yang mengikuti pilihan bahasa di atas.
@@ -70,12 +80,16 @@ lib/
     attendance/
       models/      # model data (AttendanceRecord, AttendanceSettings, status enum)
       data/        # pemanggilan API + helper lokasi GPS
-      presentation/# layar Beranda, Ajukan Izin, Riwayat
+      presentation/# layar Beranda, Ajukan Absen/Setengah Hari, Riwayat Absensi
+    leave/
+      models/      # model data (LeaveRequest, LeaveType, LeaveStatus)
+      data/        # pemanggilan API leave-requests self-service
+      presentation/# layar Ajukan Cuti/Sakit, Riwayat Cuti
   l10n/            # file ARB (id/en/ja) + AppLocalizations hasil generate (flutter gen-l10n)
 ```
 File inti di `core/`: `api_client.dart`, `api_exception.dart` (tipe error bersama: `ConnectionException`/`ApiException`/`UnknownApiException`), `auth_session.dart`, `biometric_auth_service.dart`, `locale_controller.dart`, `language_picker.dart`, `secure_storage.dart`.
 
-Backend: `D:\NET\SINARA\ERP.API` (ASP.NET Core 8 + PostgreSQL), khususnya `Controllers/v1/HR/SelfAttendanceController.cs`, `Services/HR/AttendanceService.cs`, dan `Controllers/v1/DiagnosticsController.cs` (endpoint `server-time`).
+Backend: `D:\NET\SINARA\ERP.API` (ASP.NET Core 8 + PostgreSQL), khususnya `Controllers/v1/HR/SelfAttendanceController.cs`, `Controllers/v1/HR/LeaveRequestsController.cs`, `Services/HR/AttendanceService.cs`, `Services/HR/LeaveService.cs`, dan `Controllers/v1/DiagnosticsController.cs` (endpoint `server-time`). Detail lengkap modul HR ada di `D:\NET\SINARA\ReadMeHr.md`.
 
 ## Penanganan Error & Logging
 Supaya error yang terjadi di HP karyawan tidak "hilang begitu saja" (tidak ada console yang bisa dilihat developer), ada mekanisme berikut:
