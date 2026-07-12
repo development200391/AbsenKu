@@ -64,10 +64,13 @@ class AppLocalizationsId extends AppLocalizations {
       'Lokasi kantor belum diatur oleh admin. Hubungi HR.';
 
   @override
-  String get requestLeaveButton => 'Ajukan Izin / Sakit / Cuti / Setengah Hari';
+  String get requestAbsentButton => 'Ajukan Absen / Setengah Hari';
 
   @override
-  String get markStatusTitle => 'Ajukan Izin';
+  String get requestLeaveButton => 'Ajukan Cuti / Sakit';
+
+  @override
+  String get markStatusTitle => 'Ajukan Absen / Setengah Hari';
 
   @override
   String get dateLabel => 'Tanggal';
@@ -137,4 +140,49 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get systemDefaultLanguage => 'Ikuti Bahasa Sistem';
+
+  @override
+  String get leaveRequestTitle => 'Ajukan Cuti / Sakit';
+
+  @override
+  String get leaveTypeLabel => 'Jenis Cuti';
+
+  @override
+  String get leaveTypeRequired => 'Jenis cuti wajib dipilih';
+
+  @override
+  String get dateRangeLabel => 'Periode Cuti';
+
+  @override
+  String get selectDateRangePlaceholder => 'Pilih tanggal mulai & selesai';
+
+  @override
+  String get reasonLabel => 'Alasan (opsional)';
+
+  @override
+  String get leaveHistoryTooltip => 'Riwayat Cuti';
+
+  @override
+  String get leaveHistoryTitle => 'Riwayat Pengajuan Cuti';
+
+  @override
+  String get noLeaveHistory => 'Belum ada pengajuan cuti.';
+
+  @override
+  String get leaveStatusPending => 'Menunggu';
+
+  @override
+  String get leaveStatusApproved => 'Disetujui';
+
+  @override
+  String get leaveStatusRejected => 'Ditolak';
+
+  @override
+  String leavePeriodSummary(
+    String startDate,
+    String endDate,
+    String totalDays,
+  ) {
+    return '$startDate - $endDate ($totalDays hari)';
+  }
 }

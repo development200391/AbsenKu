@@ -55,10 +55,13 @@
   "officeLocationNotConfigured": "Lokasi kantor belum diatur oleh admin. Hubungi HR.",
   "@officeLocationNotConfigured": {"description": "Warning shown when the office location has not been configured"},
 
-  "requestLeaveButton": "Ajukan Izin / Sakit / Cuti / Setengah Hari",
-  "@requestLeaveButton": {"description": "Button that opens the mark-status screen"},
+  "requestAbsentButton": "Ajukan Absen / Setengah Hari",
+  "@requestAbsentButton": {"description": "Button that opens the mark-status screen (absent/half day)"},
 
-  "markStatusTitle": "Ajukan Izin",
+  "requestLeaveButton": "Ajukan Cuti / Sakit",
+  "@requestLeaveButton": {"description": "Button that opens the leave-request screen (leave/sick)"},
+
+  "markStatusTitle": "Ajukan Absen / Setengah Hari",
   "@markStatusTitle": {"description": "App bar title for the mark-status screen"},
 
   "dateLabel": "Tanggal",
@@ -128,5 +131,51 @@
   "@chooseLanguageTitle": {"description": "Title of the language-picker dialog"},
 
   "systemDefaultLanguage": "Ikuti Bahasa Sistem",
-  "@systemDefaultLanguage": {"description": "Option to follow the device's system language instead of a fixed one"}
+  "@systemDefaultLanguage": {"description": "Option to follow the device's system language instead of a fixed one"},
+
+  "leaveRequestTitle": "Ajukan Cuti / Sakit",
+  "@leaveRequestTitle": {"description": "App bar title for the leave-request screen"},
+
+  "leaveTypeLabel": "Jenis Cuti",
+  "@leaveTypeLabel": {"description": "Label for the leave-type dropdown on the leave-request form"},
+
+  "leaveTypeRequired": "Jenis cuti wajib dipilih",
+  "@leaveTypeRequired": {"description": "Validation error when no leave type is selected"},
+
+  "dateRangeLabel": "Periode Cuti",
+  "@dateRangeLabel": {"description": "Label for the start/end date range field on the leave-request form"},
+
+  "selectDateRangePlaceholder": "Pilih tanggal mulai & selesai",
+  "@selectDateRangePlaceholder": {"description": "Placeholder shown before a date range has been picked"},
+
+  "reasonLabel": "Alasan (opsional)",
+  "@reasonLabel": {"description": "Label for the optional reason field on the leave-request form"},
+
+  "leaveHistoryTooltip": "Riwayat Cuti",
+  "@leaveHistoryTooltip": {"description": "Tooltip for the icon button that opens the leave-request history screen"},
+
+  "leaveHistoryTitle": "Riwayat Pengajuan Cuti",
+  "@leaveHistoryTitle": {"description": "App bar title for the leave-request history screen"},
+
+  "noLeaveHistory": "Belum ada pengajuan cuti.",
+  "@noLeaveHistory": {"description": "Shown when there are no leave requests yet"},
+
+  "leaveStatusPending": "Menunggu",
+  "@leaveStatusPending": {"description": "Leave request status: pending approval"},
+
+  "leaveStatusApproved": "Disetujui",
+  "@leaveStatusApproved": {"description": "Leave request status: approved"},
+
+  "leaveStatusRejected": "Ditolak",
+  "@leaveStatusRejected": {"description": "Leave request status: rejected"},
+
+  "leavePeriodSummary": "{startDate} - {endDate} ({totalDays} hari)",
+  "@leavePeriodSummary": {
+    "description": "Period and duration summary line in the leave-request history list",
+    "placeholders": {
+      "startDate": {"type": "String"},
+      "endDate": {"type": "String"},
+      "totalDays": {"type": "String"}
+    }
+  }
 }

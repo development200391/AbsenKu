@@ -14,6 +14,7 @@ import 'features/attendance/data/attendance_repository.dart';
 import 'features/auth/auth_repository.dart';
 import 'features/auth/login_screen.dart';
 import 'features/attendance/presentation/home_screen.dart';
+import 'features/leave/data/leave_repository.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
@@ -50,6 +51,7 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
   late final ApiClient _apiClient;
   late final AuthRepository _authRepository;
   late final AttendanceRepository _attendanceRepository;
+  late final LeaveRepository _leaveRepository;
   late final BiometricAuthService _biometricAuthService;
   late final GoRouter _router;
 
@@ -61,6 +63,7 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
     _apiClient = ApiClient(_storage, onSessionExpired: _authSession.logout);
     _authRepository = AuthRepository(_apiClient, _storage);
     _attendanceRepository = AttendanceRepository(_apiClient);
+    _leaveRepository = LeaveRepository(_apiClient);
     _biometricAuthService = BiometricAuthService();
 
     _router = GoRouter(
@@ -80,6 +83,7 @@ class _AbsenKuAppState extends State<AbsenKuApp> {
           path: '/',
           builder: (context, state) => HomeScreen(
             attendanceRepository: _attendanceRepository,
+            leaveRepository: _leaveRepository,
             authRepository: _authRepository,
             authSession: _authSession,
             localeController: _localeController,

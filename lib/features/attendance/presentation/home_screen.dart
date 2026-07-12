@@ -10,6 +10,8 @@ import '../../../core/language_picker.dart';
 import '../../../core/locale_controller.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/auth_repository.dart';
+import '../../leave/data/leave_repository.dart';
+import '../../leave/presentation/leave_request_screen.dart';
 import '../data/attendance_repository.dart';
 import '../data/location_helper.dart';
 import '../models/attendance_models.dart';
@@ -20,12 +22,14 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
     required this.attendanceRepository,
+    required this.leaveRepository,
     required this.authRepository,
     required this.authSession,
     required this.localeController,
   });
 
   final AttendanceRepository attendanceRepository;
+  final LeaveRepository leaveRepository;
   final AuthRepository authRepository;
   final AuthSession authSession;
   final LocaleController localeController;
@@ -217,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
                     icon: const Icon(Icons.event_busy_outlined),
-                    label: Text(l10n.requestLeaveButton),
+                    label: Text(l10n.requestAbsentButton),
                     onPressed: _isSubmitting
                         ? null
                         : () async {
@@ -227,6 +231,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             if (submitted == true) {
                               _load();
                             }
+                          },
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.medical_services_outlined),
+                    label: Text(l10n.requestLeaveButton),
+                    onPressed: _isSubmitting
+                        ? null
+                        : () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => LeaveRequestScreen(leaveRepository: widget.leaveRepository),
+                            ));
                           },
                   ),
                 ],

@@ -202,16 +202,22 @@ abstract class AppLocalizations {
   /// **'Lokasi kantor belum diatur oleh admin. Hubungi HR.'**
   String get officeLocationNotConfigured;
 
-  /// Button that opens the mark-status screen
+  /// Button that opens the mark-status screen (absent/half day)
   ///
   /// In id, this message translates to:
-  /// **'Ajukan Izin / Sakit / Cuti / Setengah Hari'**
+  /// **'Ajukan Absen / Setengah Hari'**
+  String get requestAbsentButton;
+
+  /// Button that opens the leave-request screen (leave/sick)
+  ///
+  /// In id, this message translates to:
+  /// **'Ajukan Cuti / Sakit'**
   String get requestLeaveButton;
 
   /// App bar title for the mark-status screen
   ///
   /// In id, this message translates to:
-  /// **'Ajukan Izin'**
+  /// **'Ajukan Absen / Setengah Hari'**
   String get markStatusTitle;
 
   /// Label for the date picker field
@@ -339,6 +345,84 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Ikuti Bahasa Sistem'**
   String get systemDefaultLanguage;
+
+  /// App bar title for the leave-request screen
+  ///
+  /// In id, this message translates to:
+  /// **'Ajukan Cuti / Sakit'**
+  String get leaveRequestTitle;
+
+  /// Label for the leave-type dropdown on the leave-request form
+  ///
+  /// In id, this message translates to:
+  /// **'Jenis Cuti'**
+  String get leaveTypeLabel;
+
+  /// Validation error when no leave type is selected
+  ///
+  /// In id, this message translates to:
+  /// **'Jenis cuti wajib dipilih'**
+  String get leaveTypeRequired;
+
+  /// Label for the start/end date range field on the leave-request form
+  ///
+  /// In id, this message translates to:
+  /// **'Periode Cuti'**
+  String get dateRangeLabel;
+
+  /// Placeholder shown before a date range has been picked
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih tanggal mulai & selesai'**
+  String get selectDateRangePlaceholder;
+
+  /// Label for the optional reason field on the leave-request form
+  ///
+  /// In id, this message translates to:
+  /// **'Alasan (opsional)'**
+  String get reasonLabel;
+
+  /// Tooltip for the icon button that opens the leave-request history screen
+  ///
+  /// In id, this message translates to:
+  /// **'Riwayat Cuti'**
+  String get leaveHistoryTooltip;
+
+  /// App bar title for the leave-request history screen
+  ///
+  /// In id, this message translates to:
+  /// **'Riwayat Pengajuan Cuti'**
+  String get leaveHistoryTitle;
+
+  /// Shown when there are no leave requests yet
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada pengajuan cuti.'**
+  String get noLeaveHistory;
+
+  /// Leave request status: pending approval
+  ///
+  /// In id, this message translates to:
+  /// **'Menunggu'**
+  String get leaveStatusPending;
+
+  /// Leave request status: approved
+  ///
+  /// In id, this message translates to:
+  /// **'Disetujui'**
+  String get leaveStatusApproved;
+
+  /// Leave request status: rejected
+  ///
+  /// In id, this message translates to:
+  /// **'Ditolak'**
+  String get leaveStatusRejected;
+
+  /// Period and duration summary line in the leave-request history list
+  ///
+  /// In id, this message translates to:
+  /// **'{startDate} - {endDate} ({totalDays} hari)'**
+  String leavePeriodSummary(String startDate, String endDate, String totalDays);
 }
 
 class _AppLocalizationsDelegate

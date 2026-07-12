@@ -63,10 +63,13 @@ class AppLocalizationsJa extends AppLocalizations {
       'オフィスの位置情報が管理者によって設定されていません。人事部にお問い合わせください。';
 
   @override
-  String get requestLeaveButton => '休暇 / 病欠 / 有給 / 半休を申請';
+  String get requestAbsentButton => '欠勤 / 半休を申請';
 
   @override
-  String get markStatusTitle => '休暇申請';
+  String get requestLeaveButton => '休暇 / 病欠を申請';
+
+  @override
+  String get markStatusTitle => '欠勤 / 半休申請';
 
   @override
   String get dateLabel => '日付';
@@ -134,4 +137,49 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get systemDefaultLanguage => 'システム言語に従う';
+
+  @override
+  String get leaveRequestTitle => '休暇 / 病欠申請';
+
+  @override
+  String get leaveTypeLabel => '休暇の種類';
+
+  @override
+  String get leaveTypeRequired => '休暇の種類を選択してください';
+
+  @override
+  String get dateRangeLabel => '休暇期間';
+
+  @override
+  String get selectDateRangePlaceholder => '開始日と終了日を選択';
+
+  @override
+  String get reasonLabel => '理由（任意）';
+
+  @override
+  String get leaveHistoryTooltip => '休暇履歴';
+
+  @override
+  String get leaveHistoryTitle => '休暇申請履歴';
+
+  @override
+  String get noLeaveHistory => '休暇申請はまだありません。';
+
+  @override
+  String get leaveStatusPending => '承認待ち';
+
+  @override
+  String get leaveStatusApproved => '承認済み';
+
+  @override
+  String get leaveStatusRejected => '却下';
+
+  @override
+  String leavePeriodSummary(
+    String startDate,
+    String endDate,
+    String totalDays,
+  ) {
+    return '$startDate 〜 $endDate（$totalDays日）';
+  }
 }

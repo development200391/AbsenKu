@@ -38,10 +38,10 @@ enum AttendanceStatus {
 }
 
 /// Statuses an employee may self-report via the "mark" endpoint.
+/// Sick and Cuti are excluded: those now go through the leave-request
+/// flow (see lib/features/leave) so they get approval and quota checks.
 const selfReportableStatuses = [
   AttendanceStatus.halfDay,
-  AttendanceStatus.sick,
-  AttendanceStatus.cuti,
   AttendanceStatus.absent,
 ];
 

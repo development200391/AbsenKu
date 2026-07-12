@@ -65,10 +65,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Office location has not been set up by admin. Contact HR.';
 
   @override
-  String get requestLeaveButton => 'Request Leave / Sick / Time Off / Half Day';
+  String get requestAbsentButton => 'Request Absence / Half Day';
 
   @override
-  String get markStatusTitle => 'Request Leave';
+  String get requestLeaveButton => 'Request Leave / Sick Leave';
+
+  @override
+  String get markStatusTitle => 'Request Absence / Half Day';
 
   @override
   String get dateLabel => 'Date';
@@ -137,4 +140,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get systemDefaultLanguage => 'Follow System Language';
+
+  @override
+  String get leaveRequestTitle => 'Request Leave / Sick Leave';
+
+  @override
+  String get leaveTypeLabel => 'Leave Type';
+
+  @override
+  String get leaveTypeRequired => 'Leave type is required';
+
+  @override
+  String get dateRangeLabel => 'Leave Period';
+
+  @override
+  String get selectDateRangePlaceholder => 'Select start & end date';
+
+  @override
+  String get reasonLabel => 'Reason (optional)';
+
+  @override
+  String get leaveHistoryTooltip => 'Leave History';
+
+  @override
+  String get leaveHistoryTitle => 'Leave Request History';
+
+  @override
+  String get noLeaveHistory => 'No leave requests yet.';
+
+  @override
+  String get leaveStatusPending => 'Pending';
+
+  @override
+  String get leaveStatusApproved => 'Approved';
+
+  @override
+  String get leaveStatusRejected => 'Rejected';
+
+  @override
+  String leavePeriodSummary(
+    String startDate,
+    String endDate,
+    String totalDays,
+  ) {
+    return '$startDate - $endDate ($totalDays day(s))';
+  }
 }
