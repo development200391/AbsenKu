@@ -48,11 +48,12 @@ Diakses lewat tombol "Ajukan Absen / Setengah Hari" di Beranda. Dipakai kalau ka
 Diakses lewat tombol "Ajukan Cuti / Sakit" di Beranda — terpisah dari menu Absen/Setengah Hari (poin 3) karena alurnya beda total: ini pengajuan resmi yang butuh persetujuan atasan/HR dan dipotong dari kuota cuti tahunan, sama seperti modul Leave Requests di ERP Web.
 - Pilih **jenis cuti** (dari master Leave Type di ERP Web, mis. Cuti Tahunan/Sakit/Cuti Tanpa Bayar).
 - Pilih **rentang tanggal** (tanggal mulai s/d selesai — beda dari menu Absen yang cuma 1 hari) lewat date-range picker.
+- **Lampiran (opsional)** — ketuk field "Lampiran" untuk pilih file bukti (mis. surat dokter) dari penyimpanan HP: PDF/JPG/JPEG/PNG/DOCX, maksimal 5 MB (pakai package `file_picker`). Karena ID leave request baru ada setelah submit berhasil, urutannya dua langkah di balik layar: submit dulu, baru upload lampiran pakai ID yang baru dibuat. Kalau lampiran gagal diupload padahal leave request-nya sudah tersimpan, layar tidak menganggap itu gagal total — form dikunci (tidak bisa disubmit ulang, mencegah leave request dobel) dan tampil pesan bahwa cutinya sudah tersimpan tapi lampirannya perlu diupload ulang nanti dari halaman Riwayat Cuti.
 - Alasan opsional.
 - Kirim → status jadi **Menunggu (Pending)**, belum resmi sampai disetujui HR/atasan lewat ERP Web (*HR → Leave → Requests*). Kalau ditolak melebihi kuota jenis cuti tersebut untuk tahun berjalan, submit akan gagal dengan pesan error dari server.
 - Begitu disetujui, tanggal-tanggal dalam rentang tersebut otomatis tercatat di Attendance (sinkron dari server, karyawan tidak perlu apa-apa lagi).
-- Ada ikon riwayat (🕐) di pojok kanan atas layar ini untuk melihat status semua pengajuan cuti yang pernah dibuat (Menunggu/Disetujui/Ditolak).
-- Endpoint: `GET/POST /api/v1/hr/leave-requests/self`, `GET /api/v1/hr/leave-requests/self/leave-types`.
+- Ada ikon riwayat (🕐) di pojok kanan atas layar ini untuk melihat status semua pengajuan cuti yang pernah dibuat (Menunggu/Disetujui/Ditolak) — dan di layar Riwayat Cuti, tiap pengajuan punya ikon lampiran (📎) yang buka daftar file yang sudah diupload untuk pengajuan itu.
+- Endpoint: `GET/POST /api/v1/hr/leave-requests/self`, `GET /api/v1/hr/leave-requests/self/leave-types`, `GET/POST /api/v1/documents` (upload/list lampiran), `GET /api/v1/documents/categories`.
 
 ### 5. Riwayat Absensi (History)
 Diakses lewat ikon jam di pojok kanan atas Beranda. Menampilkan daftar semua catatan absensi karyawan yang login: tanggal, jam check-in/out, dan status — untuk melihat rekap tanpa perlu buka ERP Web.

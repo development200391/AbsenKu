@@ -54,5 +54,12 @@
   "leaveStatusPending": "承認待ち",
   "leaveStatusApproved": "承認済み",
   "leaveStatusRejected": "却下",
-  "leavePeriodSummary": "{startDate} 〜 {endDate}（{totalDays}日）"
+  "leavePeriodSummary": "{startDate} 〜 {endDate}（{totalDays}日）",
+  "attachmentLabel": "添付ファイル（任意）",
+  "attachmentPlaceholder": "タップしてファイルを添付",
+  "attachmentTooLarge": "ファイルサイズは5MB以内にしてください。",
+  "attachmentUploadFailedAfterSubmit": "休暇申請は保存されましたが、添付ファイルのアップロードに失敗しました。後でもう一度添付してください。",
+  "okButton": "OK",
+  "attachmentsTitle": "添付ファイル",
+  "noAttachments": "添付ファイルはありません。"
 }

@@ -54,5 +54,12 @@
   "leaveStatusPending": "Pending",
   "leaveStatusApproved": "Approved",
   "leaveStatusRejected": "Rejected",
-  "leavePeriodSummary": "{startDate} - {endDate} ({totalDays} day(s))"
+  "leavePeriodSummary": "{startDate} - {endDate} ({totalDays} day(s))",
+  "attachmentLabel": "Attachment (optional)",
+  "attachmentPlaceholder": "Tap to attach a file",
+  "attachmentTooLarge": "File must be 5 MB or smaller.",
+  "attachmentUploadFailedAfterSubmit": "Leave request submitted, but the attachment failed to upload. You can try attaching it again later.",
+  "okButton": "OK",
+  "attachmentsTitle": "Attachments",
+  "noAttachments": "No attachments."
 }

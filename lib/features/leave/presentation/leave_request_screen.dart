@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -6,6 +7,9 @@ import '../../../l10n/app_localizations.dart';
 import '../data/leave_repository.dart';
 import '../models/leave_models.dart';
 import 'leave_history_screen.dart';
+
+const _allowedAttachmentExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'docx'];
+const _maxAttachmentSizeBytes = 5 * 1024 * 1024;
 
 class LeaveRequestScreen extends StatefulWidget {
   const LeaveRequestScreen({super.key, required this.leaveRepository});
@@ -24,6 +28,9 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   final _reasonController = TextEditingController();
   bool _isSubmitting = false;
   String? _errorMessage;
+  String? _warningMessage;
+  PlatformFile? _attachment;
+  bool _submitted = false;
 
   @override
   void initState() {
@@ -82,6 +89,31 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     }
   }
 
+  Future<void> _pickAttachment() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: _allowedAttachmentExtensions,
+      withData: true,
+    );
+
+    final picked = result?.files.single;
+    if (picked == null) {
+      return;
+    }
+
+    if (picked.size > _maxAttachmentSizeBytes) {
+      setState(() => _errorMessage = l10n.attachmentTooLarge);
+      return;
+    }
+
+    setState(() {
+      _attachment = picked;
+      _errorMessage = null;
+    });
+  }
+
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -98,15 +130,40 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     setState(() {
       _isSubmitting = true;
       _errorMessage = null;
+      _warningMessage = null;
     });
 
     try {
-      await widget.leaveRepository.submit(
+      final created = await widget.leaveRepository.submit(
         leaveTypeId: _selectedLeaveTypeId!,
         startDate: _dateRange!.start,
         endDate: _dateRange!.end,
         reason: _reasonController.text.trim().isEmpty ? null : _reasonController.text.trim(),
       );
+
+      final attachment = _attachment;
+      if (attachment != null && attachment.bytes != null) {
+        try {
+          await widget.leaveRepository.uploadAttachment(
+            leaveRequestId: created.id,
+            bytes: attachment.bytes!,
+            fileName: attachment.name,
+          );
+        } catch (e) {
+          // The leave request itself already succeeded; an attachment upload
+          // failure shouldn't be treated as a failed submission. Keep the user
+          // on this screen with a warning instead of silently losing it, since
+          // popping now would create a duplicate if they tried again.
+          if (!mounted) return;
+          setState(() {
+            _isSubmitting = false;
+            _submitted = true;
+            _warningMessage = l10n.attachmentUploadFailedAfterSubmit;
+          });
+          return;
+        }
+      }
+
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e) {
@@ -149,7 +206,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                     items: _leaveTypes
                         .map((type) => DropdownMenuItem(value: type.id, child: Text(type.name)))
                         .toList(),
-                    onChanged: (value) => setState(() => _selectedLeaveTypeId = value),
+                    onChanged: _submitted ? null : (value) => setState(() => _selectedLeaveTypeId = value),
                   ),
                   const SizedBox(height: 8),
                   ListTile(
@@ -160,25 +217,49 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                         : '${DateFormat('d MMM yyyy', locale).format(_dateRange!.start)} - '
                             '${DateFormat('d MMM yyyy', locale).format(_dateRange!.end)}'),
                     trailing: const Icon(Icons.calendar_today),
-                    onTap: _pickDateRange,
+                    onTap: _submitted ? null : _pickDateRange,
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _reasonController,
+                    enabled: !_submitted,
                     decoration: InputDecoration(labelText: l10n.reasonLabel, border: const OutlineInputBorder()),
                     maxLines: 3,
+                  ),
+                  const SizedBox(height: 8),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.attachmentLabel),
+                    subtitle: Text(_attachment?.name ?? l10n.attachmentPlaceholder),
+                    trailing: _attachment == null
+                        ? const Icon(Icons.attach_file)
+                        : IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: _submitted ? null : () => setState(() => _attachment = null),
+                          ),
+                    onTap: _submitted ? null : _pickAttachment,
                   ),
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 16),
                     Text(_errorMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                   ],
+                  if (_warningMessage != null) ...[
+                    const SizedBox(height: 16),
+                    Text(_warningMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                  ],
                   const SizedBox(height: 24),
-                  FilledButton(
-                    onPressed: _isSubmitting ? null : _submit,
-                    child: _isSubmitting
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                        : Text(l10n.submitButton),
-                  ),
+                  if (_submitted)
+                    FilledButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: Text(l10n.okButton),
+                    )
+                  else
+                    FilledButton(
+                      onPressed: _isSubmitting ? null : _submit,
+                      child: _isSubmitting
+                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                          : Text(l10n.submitButton),
+                    ),
                 ],
               ),
             ),

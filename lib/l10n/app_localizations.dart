@@ -423,6 +423,48 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'{startDate} - {endDate} ({totalDays} hari)'**
   String leavePeriodSummary(String startDate, String endDate, String totalDays);
+
+  /// Label for the optional attachment picker on the leave-request form
+  ///
+  /// In id, this message translates to:
+  /// **'Lampiran (opsional)'**
+  String get attachmentLabel;
+
+  /// Placeholder shown before a file has been attached
+  ///
+  /// In id, this message translates to:
+  /// **'Ketuk untuk lampirkan file'**
+  String get attachmentPlaceholder;
+
+  /// Validation error when the picked attachment exceeds the size limit
+  ///
+  /// In id, this message translates to:
+  /// **'Ukuran file maksimal 5 MB.'**
+  String get attachmentTooLarge;
+
+  /// Shown when the leave request itself was submitted successfully but the attachment upload failed
+  ///
+  /// In id, this message translates to:
+  /// **'Pengajuan cuti berhasil disimpan, tapi lampiran gagal diupload. Coba lampirkan lagi nanti.'**
+  String get attachmentUploadFailedAfterSubmit;
+
+  /// Generic OK/close button
+  ///
+  /// In id, this message translates to:
+  /// **'OK'**
+  String get okButton;
+
+  /// Title of the attachments bottom sheet on the leave-history screen
+  ///
+  /// In id, this message translates to:
+  /// **'Lampiran'**
+  String get attachmentsTitle;
+
+  /// Shown when a leave request has no attachments
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada lampiran.'**
+  String get noAttachments;
 }
 
 class _AppLocalizationsDelegate

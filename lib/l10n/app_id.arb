@@ -177,5 +177,26 @@
       "endDate": {"type": "String"},
       "totalDays": {"type": "String"}
     }
-  }
+  },
+
+  "attachmentLabel": "Lampiran (opsional)",
+  "@attachmentLabel": {"description": "Label for the optional attachment picker on the leave-request form"},
+
+  "attachmentPlaceholder": "Ketuk untuk lampirkan file",
+  "@attachmentPlaceholder": {"description": "Placeholder shown before a file has been attached"},
+
+  "attachmentTooLarge": "Ukuran file maksimal 5 MB.",
+  "@attachmentTooLarge": {"description": "Validation error when the picked attachment exceeds the size limit"},
+
+  "attachmentUploadFailedAfterSubmit": "Pengajuan cuti berhasil disimpan, tapi lampiran gagal diupload. Coba lampirkan lagi nanti.",
+  "@attachmentUploadFailedAfterSubmit": {"description": "Shown when the leave request itself was submitted successfully but the attachment upload failed"},
+
+  "okButton": "OK",
+  "@okButton": {"description": "Generic OK/close button"},
+
+  "attachmentsTitle": "Lampiran",
+  "@attachmentsTitle": {"description": "Title of the attachments bottom sheet on the leave-history screen"},
+
+  "noAttachments": "Tidak ada lampiran.",
+  "@noAttachments": {"description": "Shown when a leave request has no attachments"}
 }

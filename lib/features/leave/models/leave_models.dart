@@ -82,3 +82,35 @@ class LeaveRequest {
   final String? approvedByName;
   final DateTime createdAt;
 }
+
+class LeaveDocument {
+  LeaveDocument({
+    required this.id,
+    required this.originalFileName,
+    required this.fileSizeBytes,
+    required this.categoryName,
+    required this.description,
+    required this.uploadedByName,
+    required this.uploadedAt,
+  });
+
+  factory LeaveDocument.fromJson(Map<String, dynamic> json) {
+    return LeaveDocument(
+      id: json['id'] as int,
+      originalFileName: json['originalFileName'] as String,
+      fileSizeBytes: json['fileSizeBytes'] as int,
+      categoryName: json['categoryName'] as String?,
+      description: json['description'] as String?,
+      uploadedByName: json['uploadedByName'] as String,
+      uploadedAt: DateTime.parse(json['uploadedAt'] as String).toLocal(),
+    );
+  }
+
+  final int id;
+  final String originalFileName;
+  final int fileSizeBytes;
+  final String? categoryName;
+  final String? description;
+  final String uploadedByName;
+  final DateTime uploadedAt;
+}

@@ -185,4 +185,26 @@ class AppLocalizationsId extends AppLocalizations {
   ) {
     return '$startDate - $endDate ($totalDays hari)';
   }
+
+  @override
+  String get attachmentLabel => 'Lampiran (opsional)';
+
+  @override
+  String get attachmentPlaceholder => 'Ketuk untuk lampirkan file';
+
+  @override
+  String get attachmentTooLarge => 'Ukuran file maksimal 5 MB.';
+
+  @override
+  String get attachmentUploadFailedAfterSubmit =>
+      'Pengajuan cuti berhasil disimpan, tapi lampiran gagal diupload. Coba lampirkan lagi nanti.';
+
+  @override
+  String get okButton => 'OK';
+
+  @override
+  String get attachmentsTitle => 'Lampiran';
+
+  @override
+  String get noAttachments => 'Tidak ada lampiran.';
 }

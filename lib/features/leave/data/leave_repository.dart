@@ -40,6 +40,32 @@ class LeaveRepository {
     return LeaveRequest.fromJson(response.data as Map<String, dynamic>);
   }
 
+  Future<List<LeaveDocument>> getAttachments(int leaveRequestId) async {
+    final response = await _run(() => _apiClient.dio.get('/documents', queryParameters: {
+          'referenceType': _referenceType,
+          'referenceId': leaveRequestId,
+        }));
+    final items = response.data as List<dynamic>;
+    return items.map((item) => LeaveDocument.fromJson(item as Map<String, dynamic>)).toList();
+  }
+
+  Future<LeaveDocument> uploadAttachment({
+    required int leaveRequestId,
+    required List<int> bytes,
+    required String fileName,
+  }) async {
+    final formData = FormData.fromMap({
+      'referenceType': _referenceType,
+      'referenceId': leaveRequestId,
+      'file': MultipartFile.fromBytes(bytes, filename: fileName),
+    });
+
+    final response = await _run(() => _apiClient.dio.post('/documents', data: formData));
+    return LeaveDocument.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  static const _referenceType = 'hr_leave_requests';
+
   Future<Response> _run(Future<Response> Function() request) async {
     try {
       return await request();

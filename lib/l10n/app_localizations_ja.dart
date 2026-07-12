@@ -182,4 +182,26 @@ class AppLocalizationsJa extends AppLocalizations {
   ) {
     return '$startDate 〜 $endDate（$totalDays日）';
   }
+
+  @override
+  String get attachmentLabel => '添付ファイル（任意）';
+
+  @override
+  String get attachmentPlaceholder => 'タップしてファイルを添付';
+
+  @override
+  String get attachmentTooLarge => 'ファイルサイズは5MB以内にしてください。';
+
+  @override
+  String get attachmentUploadFailedAfterSubmit =>
+      '休暇申請は保存されましたが、添付ファイルのアップロードに失敗しました。後でもう一度添付してください。';
+
+  @override
+  String get okButton => 'OK';
+
+  @override
+  String get attachmentsTitle => '添付ファイル';
+
+  @override
+  String get noAttachments => '添付ファイルはありません。';
 }

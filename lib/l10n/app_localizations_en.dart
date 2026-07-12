@@ -185,4 +185,26 @@ class AppLocalizationsEn extends AppLocalizations {
   ) {
     return '$startDate - $endDate ($totalDays day(s))';
   }
+
+  @override
+  String get attachmentLabel => 'Attachment (optional)';
+
+  @override
+  String get attachmentPlaceholder => 'Tap to attach a file';
+
+  @override
+  String get attachmentTooLarge => 'File must be 5 MB or smaller.';
+
+  @override
+  String get attachmentUploadFailedAfterSubmit =>
+      'Leave request submitted, but the attachment failed to upload. You can try attaching it again later.';
+
+  @override
+  String get okButton => 'OK';
+
+  @override
+  String get attachmentsTitle => 'Attachments';
+
+  @override
+  String get noAttachments => 'No attachments.';
 }
