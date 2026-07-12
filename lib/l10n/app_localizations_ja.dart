@@ -187,14 +187,30 @@ class AppLocalizationsJa extends AppLocalizations {
   String get attachmentLabel => '添付ファイル（任意）';
 
   @override
+  String get attachmentLabelRequired => '添付ファイル（必須）';
+
+  @override
   String get attachmentPlaceholder => 'タップしてファイルを添付';
 
   @override
   String get attachmentTooLarge => 'ファイルサイズは5MB以内にしてください。';
 
   @override
-  String get attachmentUploadFailedAfterSubmit =>
-      '休暇申請は保存されましたが、添付ファイルのアップロードに失敗しました。後でもう一度添付してください。';
+  String get attachmentRequiredMessage => '少なくとも1つのファイルを添付してください。';
+
+  @override
+  String attachmentMaxCountMessage(int count) {
+    return '最大$count件のファイルを添付できます。';
+  }
+
+  @override
+  String get attachmentAddButton => 'ファイルを追加';
+
+  @override
+  String get attachmentRemoveTooltip => '削除';
+
+  @override
+  String get attachmentWarningsTitle => '添付ファイルの警告';
 
   @override
   String get okButton => 'OK';

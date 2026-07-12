@@ -430,6 +430,12 @@ abstract class AppLocalizations {
   /// **'Lampiran (opsional)'**
   String get attachmentLabel;
 
+  /// Label for the attachment picker when the module config marks it as required
+  ///
+  /// In id, this message translates to:
+  /// **'Lampiran (wajib)'**
+  String get attachmentLabelRequired;
+
   /// Placeholder shown before a file has been attached
   ///
   /// In id, this message translates to:
@@ -442,11 +448,35 @@ abstract class AppLocalizations {
   /// **'Ukuran file maksimal 5 MB.'**
   String get attachmentTooLarge;
 
-  /// Shown when the leave request itself was submitted successfully but the attachment upload failed
+  /// Validation error shown when the config requires an attachment but none was picked
   ///
   /// In id, this message translates to:
-  /// **'Pengajuan cuti berhasil disimpan, tapi lampiran gagal diupload. Coba lampirkan lagi nanti.'**
-  String get attachmentUploadFailedAfterSubmit;
+  /// **'Mohon lampirkan minimal satu file.'**
+  String get attachmentRequiredMessage;
+
+  /// Shown when the user tries to pick more files than the config's max file count
+  ///
+  /// In id, this message translates to:
+  /// **'Anda dapat melampirkan maksimal {count} file.'**
+  String attachmentMaxCountMessage(int count);
+
+  /// Button to pick another attachment file when multi-file is allowed
+  ///
+  /// In id, this message translates to:
+  /// **'Tambah File'**
+  String get attachmentAddButton;
+
+  /// Tooltip for the button that removes a picked (not-yet-uploaded) attachment
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus'**
+  String get attachmentRemoveTooltip;
+
+  /// Title of the dialog shown when the leave request was submitted but some attachments failed
+  ///
+  /// In id, this message translates to:
+  /// **'Peringatan Lampiran'**
+  String get attachmentWarningsTitle;
 
   /// Generic OK/close button
   ///

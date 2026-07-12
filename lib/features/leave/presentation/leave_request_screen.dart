@@ -8,8 +8,8 @@ import '../data/leave_repository.dart';
 import '../models/leave_models.dart';
 import 'leave_history_screen.dart';
 
-const _allowedAttachmentExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'docx'];
-const _maxAttachmentSizeBytes = 5 * 1024 * 1024;
+const _defaultAllowedAttachmentExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'docx'];
+const _defaultMaxAttachmentSizeBytes = 5 * 1024 * 1024;
 
 class LeaveRequestScreen extends StatefulWidget {
   const LeaveRequestScreen({super.key, required this.leaveRepository});
@@ -22,20 +22,19 @@ class LeaveRequestScreen extends StatefulWidget {
 
 class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   List<LeaveType> _leaveTypes = [];
-  bool _isLoadingTypes = true;
+  DocumentReferenceTypeConfig? _attachmentConfig;
+  bool _isLoading = true;
   int? _selectedLeaveTypeId;
   DateTimeRange? _dateRange;
   final _reasonController = TextEditingController();
   bool _isSubmitting = false;
   String? _errorMessage;
-  String? _warningMessage;
-  PlatformFile? _attachment;
-  bool _submitted = false;
+  final List<PlatformFile> _attachments = [];
 
   @override
   void initState() {
     super.initState();
-    _loadLeaveTypes();
+    _loadInitialData();
   }
 
   @override
@@ -44,24 +43,39 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     super.dispose();
   }
 
-  Future<void> _loadLeaveTypes() async {
+  List<String> get _allowedExtensions =>
+      _attachmentConfig?.allowedExtensions.map((ext) => ext.replaceFirst('.', '')).toList() ??
+      _defaultAllowedAttachmentExtensions;
+
+  int get _maxFileSizeBytes => _attachmentConfig?.maxFileSizeBytes ?? _defaultMaxAttachmentSizeBytes;
+
+  int get _maxFileCount => _attachmentConfig?.maxFileCount ?? 1;
+
+  bool get _isAttachmentRequired => _attachmentConfig?.isRequired ?? false;
+
+  Future<void> _loadInitialData() async {
     setState(() {
-      _isLoadingTypes = true;
+      _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final leaveTypes = await widget.leaveRepository.getLeaveTypes();
+      final results = await Future.wait([
+        widget.leaveRepository.getLeaveTypes(),
+        widget.leaveRepository.getAttachmentConfig(),
+      ]);
       if (!mounted) return;
+      final leaveTypes = results[0] as List<LeaveType>;
       setState(() {
         _leaveTypes = leaveTypes;
         _selectedLeaveTypeId = leaveTypes.isEmpty ? null : leaveTypes.first.id;
-        _isLoadingTypes = false;
+        _attachmentConfig = results[1] as DocumentReferenceTypeConfig?;
+        _isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _isLoadingTypes = false;
+        _isLoading = false;
         _errorMessage = _describeError(e);
       });
     }
@@ -89,29 +103,42 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     }
   }
 
-  Future<void> _pickAttachment() async {
+  Future<void> _pickAttachments() async {
     final l10n = AppLocalizations.of(context)!;
-
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: _allowedAttachmentExtensions,
-      withData: true,
-    );
-
-    final picked = result?.files.single;
-    if (picked == null) {
+    final remainingSlots = _maxFileCount - _attachments.length;
+    if (remainingSlots <= 0) {
+      setState(() => _errorMessage = l10n.attachmentMaxCountMessage(_maxFileCount));
       return;
     }
 
-    if (picked.size > _maxAttachmentSizeBytes) {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: _allowedExtensions,
+      withData: true,
+      allowMultiple: _maxFileCount > 1,
+    );
+
+    final picked = result?.files ?? [];
+    if (picked.isEmpty) {
+      return;
+    }
+
+    final tooLarge = picked.any((file) => file.size > _maxFileSizeBytes);
+    if (tooLarge) {
       setState(() => _errorMessage = l10n.attachmentTooLarge);
       return;
     }
 
+    final accepted = picked.take(remainingSlots).toList();
+
     setState(() {
-      _attachment = picked;
-      _errorMessage = null;
+      _attachments.addAll(accepted);
+      _errorMessage = picked.length > remainingSlots ? l10n.attachmentMaxCountMessage(_maxFileCount) : null;
     });
+  }
+
+  void _removeAttachment(int index) {
+    setState(() => _attachments.removeAt(index));
   }
 
   Future<void> _submit() async {
@@ -127,44 +154,47 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       return;
     }
 
+    if (_isAttachmentRequired && _attachments.isEmpty) {
+      setState(() => _errorMessage = l10n.attachmentRequiredMessage);
+      return;
+    }
+
     setState(() {
       _isSubmitting = true;
       _errorMessage = null;
-      _warningMessage = null;
     });
 
     try {
-      final created = await widget.leaveRepository.submit(
+      final result = await widget.leaveRepository.submit(
         leaveTypeId: _selectedLeaveTypeId!,
         startDate: _dateRange!.start,
         endDate: _dateRange!.end,
         reason: _reasonController.text.trim().isEmpty ? null : _reasonController.text.trim(),
+        files: _attachments
+            .where((file) => file.bytes != null)
+            .map((file) => (bytes: file.bytes!, fileName: file.name))
+            .toList(),
       );
 
-      final attachment = _attachment;
-      if (attachment != null && attachment.bytes != null) {
-        try {
-          await widget.leaveRepository.uploadAttachment(
-            leaveRequestId: created.id,
-            bytes: attachment.bytes!,
-            fileName: attachment.name,
-          );
-        } catch (e) {
-          // The leave request itself already succeeded; an attachment upload
-          // failure shouldn't be treated as a failed submission. Keep the user
-          // on this screen with a warning instead of silently losing it, since
-          // popping now would create a duplicate if they tried again.
-          if (!mounted) return;
-          setState(() {
-            _isSubmitting = false;
-            _submitted = true;
-            _warningMessage = l10n.attachmentUploadFailedAfterSubmit;
-          });
-          return;
-        }
+      if (!mounted) return;
+
+      if (result.attachmentWarnings.isNotEmpty) {
+        await showDialog<void>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: Text(l10n.attachmentWarningsTitle),
+            content: Text(result.attachmentWarnings.join('\n')),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text(l10n.okButton),
+              ),
+            ],
+          ),
+        );
+        if (!mounted) return;
       }
 
-      if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
@@ -193,12 +223,11 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
           ),
         ],
       ),
-      body: _isLoadingTypes
+      body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: ListView(
                 children: [
                   DropdownButtonFormField<int>(
                     initialValue: _selectedLeaveTypeId,
@@ -206,7 +235,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                     items: _leaveTypes
                         .map((type) => DropdownMenuItem(value: type.id, child: Text(type.name)))
                         .toList(),
-                    onChanged: _submitted ? null : (value) => setState(() => _selectedLeaveTypeId = value),
+                    onChanged: (value) => setState(() => _selectedLeaveTypeId = value),
                   ),
                   const SizedBox(height: 8),
                   ListTile(
@@ -217,49 +246,55 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                         : '${DateFormat('d MMM yyyy', locale).format(_dateRange!.start)} - '
                             '${DateFormat('d MMM yyyy', locale).format(_dateRange!.end)}'),
                     trailing: const Icon(Icons.calendar_today),
-                    onTap: _submitted ? null : _pickDateRange,
+                    onTap: _pickDateRange,
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _reasonController,
-                    enabled: !_submitted,
                     decoration: InputDecoration(labelText: l10n.reasonLabel, border: const OutlineInputBorder()),
                     maxLines: 3,
                   ),
-                  const SizedBox(height: 8),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l10n.attachmentLabel),
-                    subtitle: Text(_attachment?.name ?? l10n.attachmentPlaceholder),
-                    trailing: _attachment == null
-                        ? const Icon(Icons.attach_file)
-                        : IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: _submitted ? null : () => setState(() => _attachment = null),
-                          ),
-                    onTap: _submitted ? null : _pickAttachment,
+                  const SizedBox(height: 16),
+                  Text(
+                    _isAttachmentRequired ? l10n.attachmentLabelRequired : l10n.attachmentLabel,
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
+                  if (_attachments.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Text(l10n.attachmentPlaceholder, style: Theme.of(context).textTheme.bodyMedium),
+                    )
+                  else
+                    ...List.generate(_attachments.length, (index) {
+                      final file = _attachments[index];
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.insert_drive_file),
+                        title: Text(file.name, overflow: TextOverflow.ellipsis),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.close),
+                          tooltip: l10n.attachmentRemoveTooltip,
+                          onPressed: () => _removeAttachment(index),
+                        ),
+                      );
+                    }),
+                  if (_attachments.length < _maxFileCount)
+                    OutlinedButton.icon(
+                      onPressed: _pickAttachments,
+                      icon: const Icon(Icons.attach_file),
+                      label: Text(l10n.attachmentAddButton),
+                    ),
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 16),
                     Text(_errorMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                   ],
-                  if (_warningMessage != null) ...[
-                    const SizedBox(height: 16),
-                    Text(_warningMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                  ],
                   const SizedBox(height: 24),
-                  if (_submitted)
-                    FilledButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: Text(l10n.okButton),
-                    )
-                  else
-                    FilledButton(
-                      onPressed: _isSubmitting ? null : _submit,
-                      child: _isSubmitting
-                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                          : Text(l10n.submitButton),
-                    ),
+                  FilledButton(
+                    onPressed: _isSubmitting ? null : _submit,
+                    child: _isSubmitting
+                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                        : Text(l10n.submitButton),
+                  ),
                 ],
               ),
             ),

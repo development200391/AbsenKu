@@ -190,14 +190,30 @@ class AppLocalizationsId extends AppLocalizations {
   String get attachmentLabel => 'Lampiran (opsional)';
 
   @override
+  String get attachmentLabelRequired => 'Lampiran (wajib)';
+
+  @override
   String get attachmentPlaceholder => 'Ketuk untuk lampirkan file';
 
   @override
   String get attachmentTooLarge => 'Ukuran file maksimal 5 MB.';
 
   @override
-  String get attachmentUploadFailedAfterSubmit =>
-      'Pengajuan cuti berhasil disimpan, tapi lampiran gagal diupload. Coba lampirkan lagi nanti.';
+  String get attachmentRequiredMessage => 'Mohon lampirkan minimal satu file.';
+
+  @override
+  String attachmentMaxCountMessage(int count) {
+    return 'Anda dapat melampirkan maksimal $count file.';
+  }
+
+  @override
+  String get attachmentAddButton => 'Tambah File';
+
+  @override
+  String get attachmentRemoveTooltip => 'Hapus';
+
+  @override
+  String get attachmentWarningsTitle => 'Peringatan Lampiran';
 
   @override
   String get okButton => 'OK';

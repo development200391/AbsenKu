@@ -88,7 +88,6 @@ class LeaveDocument {
     required this.id,
     required this.originalFileName,
     required this.fileSizeBytes,
-    required this.categoryName,
     required this.description,
     required this.uploadedByName,
     required this.uploadedAt,
@@ -99,7 +98,6 @@ class LeaveDocument {
       id: json['id'] as int,
       originalFileName: json['originalFileName'] as String,
       fileSizeBytes: json['fileSizeBytes'] as int,
-      categoryName: json['categoryName'] as String?,
       description: json['description'] as String?,
       uploadedByName: json['uploadedByName'] as String,
       uploadedAt: DateTime.parse(json['uploadedAt'] as String).toLocal(),
@@ -109,8 +107,54 @@ class LeaveDocument {
   final int id;
   final String originalFileName;
   final int fileSizeBytes;
-  final String? categoryName;
   final String? description;
   final String uploadedByName;
   final DateTime uploadedAt;
+}
+
+class SubmitLeaveRequestResult {
+  SubmitLeaveRequestResult({required this.leaveRequest, required this.attachmentWarnings});
+
+  factory SubmitLeaveRequestResult.fromJson(Map<String, dynamic> json) {
+    return SubmitLeaveRequestResult(
+      leaveRequest: LeaveRequest.fromJson(json['leaveRequest'] as Map<String, dynamic>),
+      attachmentWarnings: (json['attachmentWarnings'] as List<dynamic>? ?? [])
+          .map((item) => item as String)
+          .toList(),
+    );
+  }
+
+  final LeaveRequest leaveRequest;
+  final List<String> attachmentWarnings;
+}
+
+class DocumentReferenceTypeConfig {
+  DocumentReferenceTypeConfig({
+    required this.displayName,
+    required this.isRequired,
+    required this.maxFileSizeBytes,
+    required this.maxFileCount,
+    required this.allowedExtensions,
+  });
+
+  factory DocumentReferenceTypeConfig.fromJson(Map<String, dynamic> json) {
+    final extensionsRaw = json['allowedExtensions'] as String?;
+    return DocumentReferenceTypeConfig(
+      displayName: json['displayName'] as String,
+      isRequired: json['isRequired'] as bool,
+      maxFileSizeBytes: json['maxFileSizeBytes'] as int?,
+      maxFileCount: json['maxFileCount'] as int,
+      allowedExtensions: (extensionsRaw == null || extensionsRaw.trim().isEmpty)
+          ? const ['.pdf', '.jpg', '.jpeg', '.png', '.docx']
+          : extensionsRaw.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
+    );
+  }
+
+  final String displayName;
+  final bool isRequired;
+  final int? maxFileSizeBytes;
+  final int maxFileCount;
+  final List<String> allowedExtensions;
+
+  bool get allowMultiple => maxFileCount > 1;
 }
