@@ -8,8 +8,17 @@ import '../data/leave_repository.dart';
 import '../models/leave_models.dart';
 import 'leave_history_screen.dart';
 
-const _defaultAllowedAttachmentExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'docx'];
 const _defaultMaxAttachmentSizeBytes = 5 * 1024 * 1024;
+
+class _AttachmentSlot {
+  _AttachmentSlot(this.detail);
+
+  final DocumentReferenceTypeConfigDetail detail;
+  final TextEditingController noteController = TextEditingController();
+  PlatformFile? file;
+
+  void dispose() => noteController.dispose();
+}
 
 class LeaveRequestScreen extends StatefulWidget {
   const LeaveRequestScreen({super.key, required this.leaveRepository});
@@ -22,14 +31,13 @@ class LeaveRequestScreen extends StatefulWidget {
 
 class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   List<LeaveType> _leaveTypes = [];
-  DocumentReferenceTypeConfig? _attachmentConfig;
+  final List<_AttachmentSlot> _slots = [];
   bool _isLoading = true;
   int? _selectedLeaveTypeId;
   DateTimeRange? _dateRange;
   final _reasonController = TextEditingController();
   bool _isSubmitting = false;
   String? _errorMessage;
-  final List<PlatformFile> _attachments = [];
 
   @override
   void initState() {
@@ -40,18 +48,11 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   @override
   void dispose() {
     _reasonController.dispose();
+    for (final slot in _slots) {
+      slot.dispose();
+    }
     super.dispose();
   }
-
-  List<String> get _allowedExtensions =>
-      _attachmentConfig?.allowedExtensions.map((ext) => ext.replaceFirst('.', '')).toList() ??
-      _defaultAllowedAttachmentExtensions;
-
-  int get _maxFileSizeBytes => _attachmentConfig?.maxFileSizeBytes ?? _defaultMaxAttachmentSizeBytes;
-
-  int get _maxFileCount => _attachmentConfig?.maxFileCount ?? 1;
-
-  bool get _isAttachmentRequired => _attachmentConfig?.isRequired ?? false;
 
   Future<void> _loadInitialData() async {
     setState(() {
@@ -66,10 +67,11 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       ]);
       if (!mounted) return;
       final leaveTypes = results[0] as List<LeaveType>;
+      final config = results[1] as DocumentReferenceTypeConfig?;
       setState(() {
         _leaveTypes = leaveTypes;
         _selectedLeaveTypeId = leaveTypes.isEmpty ? null : leaveTypes.first.id;
-        _attachmentConfig = results[1] as DocumentReferenceTypeConfig?;
+        _slots.addAll((config?.details ?? []).map(_AttachmentSlot.new));
         _isLoading = false;
       });
     } catch (e) {
@@ -103,42 +105,35 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     }
   }
 
-  Future<void> _pickAttachments() async {
+  Future<void> _pickSlotFile(int index) async {
     final l10n = AppLocalizations.of(context)!;
-    final remainingSlots = _maxFileCount - _attachments.length;
-    if (remainingSlots <= 0) {
-      setState(() => _errorMessage = l10n.attachmentMaxCountMessage(_maxFileCount));
-      return;
-    }
+    final slot = _slots[index];
+    final maxSize = slot.detail.maxFileSizeBytes ?? _defaultMaxAttachmentSizeBytes;
 
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: _allowedExtensions,
+      allowedExtensions: slot.detail.allowedExtensions.map((ext) => ext.replaceFirst('.', '')).toList(),
       withData: true,
-      allowMultiple: _maxFileCount > 1,
     );
 
-    final picked = result?.files ?? [];
-    if (picked.isEmpty) {
+    final picked = result?.files.single;
+    if (picked == null) {
       return;
     }
 
-    final tooLarge = picked.any((file) => file.size > _maxFileSizeBytes);
-    if (tooLarge) {
+    if (picked.size > maxSize) {
       setState(() => _errorMessage = l10n.attachmentTooLarge);
       return;
     }
 
-    final accepted = picked.take(remainingSlots).toList();
-
     setState(() {
-      _attachments.addAll(accepted);
-      _errorMessage = picked.length > remainingSlots ? l10n.attachmentMaxCountMessage(_maxFileCount) : null;
+      slot.file = picked;
+      _errorMessage = null;
     });
   }
 
-  void _removeAttachment(int index) {
-    setState(() => _attachments.removeAt(index));
+  void _removeSlotFile(int index) {
+    setState(() => _slots[index].file = null);
   }
 
   Future<void> _submit() async {
@@ -154,9 +149,11 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       return;
     }
 
-    if (_isAttachmentRequired && _attachments.isEmpty) {
-      setState(() => _errorMessage = l10n.attachmentRequiredMessage);
-      return;
+    for (final slot in _slots) {
+      if (slot.detail.isRequired && slot.file == null) {
+        setState(() => _errorMessage = l10n.attachmentSlotRequiredMessage(slot.detail.name));
+        return;
+      }
     }
 
     setState(() {
@@ -170,9 +167,12 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         startDate: _dateRange!.start,
         endDate: _dateRange!.end,
         reason: _reasonController.text.trim().isEmpty ? null : _reasonController.text.trim(),
-        files: _attachments
-            .where((file) => file.bytes != null)
-            .map((file) => (bytes: file.bytes!, fileName: file.name))
+        slots: _slots
+            .map((slot) => (
+                  bytes: slot.file?.bytes,
+                  fileName: slot.file?.name,
+                  note: slot.noteController.text.trim().isEmpty ? null : slot.noteController.text.trim(),
+                ))
             .toList(),
       );
 
@@ -203,6 +203,94 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         _errorMessage = _describeError(e);
       });
     }
+  }
+
+  Widget _buildSlot(BuildContext context, int index) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final slot = _slots[index];
+    final hasFile = slot.file != null;
+    final isMissingRequired = slot.detail.isRequired && !hasFile;
+    final stripeColor = hasFile
+        ? Colors.green
+        : (isMissingRequired ? Colors.orange : theme.dividerColor);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: theme.dividerColor),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(width: 3, height: 16, color: stripeColor, margin: const EdgeInsets.only(right: 8)),
+              Expanded(
+                child: Text(
+                  slot.detail.name,
+                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ),
+              Text(
+                slot.detail.isRequired ? l10n.attachmentRequiredTag : l10n.attachmentOptionalTag,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: slot.detail.isRequired ? Colors.orange[800] : theme.hintColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          InkWell(
+            onTap: hasFile ? null : () => _pickSlotFile(index),
+            borderRadius: BorderRadius.circular(6),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                color: hasFile ? Colors.green.withValues(alpha: 0.08) : null,
+                border: Border.all(color: hasFile ? Colors.green.withValues(alpha: 0.4) : theme.dividerColor),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Row(
+                children: [
+                  Icon(hasFile ? Icons.insert_drive_file : Icons.attach_file, size: 16, color: hasFile ? Colors.green : null),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      hasFile ? slot.file!.name : l10n.attachmentPlaceholder,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  if (hasFile)
+                    InkWell(
+                      onTap: () => _removeSlotFile(index),
+                      child: Padding(
+                        padding: const EdgeInsets.all(2),
+                        child: Icon(Icons.close, size: 16, semanticLabel: l10n.attachmentRemoveTooltip),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            controller: slot.noteController,
+            style: const TextStyle(fontSize: 13),
+            decoration: InputDecoration(
+              isDense: true,
+              hintText: l10n.notesLabel,
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -254,36 +342,12 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                     decoration: InputDecoration(labelText: l10n.reasonLabel, border: const OutlineInputBorder()),
                     maxLines: 3,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _isAttachmentRequired ? l10n.attachmentLabelRequired : l10n.attachmentLabel,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  if (_attachments.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Text(l10n.attachmentPlaceholder, style: Theme.of(context).textTheme.bodyMedium),
-                    )
-                  else
-                    ...List.generate(_attachments.length, (index) {
-                      final file = _attachments[index];
-                      return ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: const Icon(Icons.insert_drive_file),
-                        title: Text(file.name, overflow: TextOverflow.ellipsis),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.close),
-                          tooltip: l10n.attachmentRemoveTooltip,
-                          onPressed: () => _removeAttachment(index),
-                        ),
-                      );
-                    }),
-                  if (_attachments.length < _maxFileCount)
-                    OutlinedButton.icon(
-                      onPressed: _pickAttachments,
-                      icon: const Icon(Icons.attach_file),
-                      label: Text(l10n.attachmentAddButton),
-                    ),
+                  if (_slots.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Text(l10n.attachmentsTitle, style: Theme.of(context).textTheme.titleSmall),
+                    const SizedBox(height: 8),
+                    ...List.generate(_slots.length, (index) => _buildSlot(context, index)),
+                  ],
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 16),
                     Text(_errorMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error)),

@@ -179,29 +179,23 @@
     }
   },
 
-  "attachmentLabel": "Lampiran (opsional)",
-  "@attachmentLabel": {"description": "Label for the optional attachment picker on the leave-request form"},
-
-  "attachmentLabelRequired": "Lampiran (wajib)",
-  "@attachmentLabelRequired": {"description": "Label for the attachment picker when the module config marks it as required"},
-
   "attachmentPlaceholder": "Ketuk untuk lampirkan file",
   "@attachmentPlaceholder": {"description": "Placeholder shown before a file has been attached"},
 
   "attachmentTooLarge": "Ukuran file maksimal 5 MB.",
   "@attachmentTooLarge": {"description": "Validation error when the picked attachment exceeds the size limit"},
 
-  "attachmentRequiredMessage": "Mohon lampirkan minimal satu file.",
-  "@attachmentRequiredMessage": {"description": "Validation error shown when the config requires an attachment but none was picked"},
-
-  "attachmentMaxCountMessage": "Anda dapat melampirkan maksimal {count} file.",
-  "@attachmentMaxCountMessage": {
-    "description": "Shown when the user tries to pick more files than the config's max file count",
-    "placeholders": {"count": {"type": "int"}}
+  "attachmentSlotRequiredMessage": "{name} wajib diisi.",
+  "@attachmentSlotRequiredMessage": {
+    "description": "Validation error shown when a specific attachment slot is required but was left empty",
+    "placeholders": {"name": {"type": "String"}}
   },
 
-  "attachmentAddButton": "Tambah File",
-  "@attachmentAddButton": {"description": "Button to pick another attachment file when multi-file is allowed"},
+  "attachmentRequiredTag": "Wajib",
+  "@attachmentRequiredTag": {"description": "Short tag next to an attachment slot's name when it is required"},
+
+  "attachmentOptionalTag": "Opsional",
+  "@attachmentOptionalTag": {"description": "Short tag next to an attachment slot's name when it is optional"},
 
   "attachmentRemoveTooltip": "Hapus",
   "@attachmentRemoveTooltip": {"description": "Tooltip for the button that removes a picked (not-yet-uploaded) attachment"},

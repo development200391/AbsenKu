@@ -184,27 +184,21 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get attachmentLabel => '添付ファイル（任意）';
-
-  @override
-  String get attachmentLabelRequired => '添付ファイル（必須）';
-
-  @override
   String get attachmentPlaceholder => 'タップしてファイルを添付';
 
   @override
   String get attachmentTooLarge => 'ファイルサイズは5MB以内にしてください。';
 
   @override
-  String get attachmentRequiredMessage => '少なくとも1つのファイルを添付してください。';
-
-  @override
-  String attachmentMaxCountMessage(int count) {
-    return '最大$count件のファイルを添付できます。';
+  String attachmentSlotRequiredMessage(String name) {
+    return '$nameは必須です。';
   }
 
   @override
-  String get attachmentAddButton => 'ファイルを追加';
+  String get attachmentRequiredTag => '必須';
+
+  @override
+  String get attachmentOptionalTag => '任意';
 
   @override
   String get attachmentRemoveTooltip => '削除';

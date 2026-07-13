@@ -128,33 +128,61 @@ class SubmitLeaveRequestResult {
   final List<String> attachmentWarnings;
 }
 
-class DocumentReferenceTypeConfig {
-  DocumentReferenceTypeConfig({
-    required this.displayName,
+/// One row per attachment slot the module defines (e.g. "KTP", "Surat
+/// Keterangan Dokter") — mirrors doc_reference_type_config_details on the
+/// server. Each slot gets its own file picker and note in the UI.
+class DocumentReferenceTypeConfigDetail {
+  DocumentReferenceTypeConfigDetail({
+    required this.name,
     required this.isRequired,
+    required this.isActive,
     required this.maxFileSizeBytes,
-    required this.maxFileCount,
     required this.allowedExtensions,
   });
 
-  factory DocumentReferenceTypeConfig.fromJson(Map<String, dynamic> json) {
+  factory DocumentReferenceTypeConfigDetail.fromJson(Map<String, dynamic> json) {
     final extensionsRaw = json['allowedExtensions'] as String?;
-    return DocumentReferenceTypeConfig(
-      displayName: json['displayName'] as String,
+    return DocumentReferenceTypeConfigDetail(
+      name: json['name'] as String,
       isRequired: json['isRequired'] as bool,
+      isActive: json['isActive'] as bool,
       maxFileSizeBytes: json['maxFileSizeBytes'] as int?,
-      maxFileCount: json['maxFileCount'] as int,
       allowedExtensions: (extensionsRaw == null || extensionsRaw.trim().isEmpty)
           ? const ['.pdf', '.jpg', '.jpeg', '.png', '.docx']
           : extensionsRaw.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
     );
   }
 
-  final String displayName;
+  final String name;
   final bool isRequired;
+  final bool isActive;
   final int? maxFileSizeBytes;
-  final int maxFileCount;
   final List<String> allowedExtensions;
+}
 
-  bool get allowMultiple => maxFileCount > 1;
+class DocumentReferenceTypeConfig {
+  DocumentReferenceTypeConfig({
+    required this.displayName,
+    required this.isMultiple,
+    required this.maxFileCount,
+    required this.details,
+  });
+
+  factory DocumentReferenceTypeConfig.fromJson(Map<String, dynamic> json) {
+    final detailsRaw = json['details'] as List<dynamic>? ?? [];
+    return DocumentReferenceTypeConfig(
+      displayName: json['displayName'] as String,
+      isMultiple: json['isMultiple'] as bool,
+      maxFileCount: json['maxFileCount'] as int,
+      details: detailsRaw
+          .map((item) => DocumentReferenceTypeConfigDetail.fromJson(item as Map<String, dynamic>))
+          .where((detail) => detail.isActive)
+          .toList(),
+    );
+  }
+
+  final String displayName;
+  final bool isMultiple;
+  final int maxFileCount;
+  final List<DocumentReferenceTypeConfigDetail> details;
 }

@@ -51,28 +51,45 @@ class LeaveRepository {
     return items.map((item) => LeaveDocument.fromJson(item as Map<String, dynamic>)).toList();
   }
 
-  /// Submits the leave request and any attachments together in a single
-  /// request. The server creates the leave request first and then attaches
-  /// each file to it, so a rejected/corrupt file never leaves an orphaned
-  /// upload behind and a required-attachment rule can be enforced before
-  /// anything is saved at all.
+  /// Submits the leave request and every attachment slot together in a
+  /// single request. The server creates the leave request first and then
+  /// attaches each file to it, so a rejected/corrupt file never leaves an
+  /// orphaned upload behind and a required-attachment rule can be enforced
+  /// before anything is saved at all.
+  ///
+  /// [slots] must have one entry per active `DocumentReferenceTypeConfigDetail`,
+  /// in the same order — including empty entries (bytes: null) for slots the
+  /// user left blank. Every slot always sends a `Files` part (empty when
+  /// unset) and a positionally-matching `Notes[i]` part, because the server
+  /// tells "slot i has no attachment" apart from "slot i has no *new*
+  /// attachment" purely by that positional alignment (see
+  /// ReadMeDocumentGeneral.md, "Integrasi Web" — the same alignment
+  /// requirement the Web client has to honor).
   Future<SubmitLeaveRequestResult> submit({
     required int leaveTypeId,
     required DateTime startDate,
     required DateTime endDate,
     String? reason,
-    String? note,
-    List<({List<int> bytes, String fileName})> files = const [],
+    List<({List<int>? bytes, String? fileName, String? note})> slots = const [],
   }) async {
-    final formData = FormData.fromMap({
-      'LeaveTypeId': leaveTypeId,
-      'StartDate': _formatDate(startDate),
-      'EndDate': _formatDate(endDate),
-      if (reason != null) 'Reason': reason,
-      if (note != null) 'Note': note,
-      if (files.isNotEmpty)
-        'Files': files.map((f) => MultipartFile.fromBytes(f.bytes, filename: f.fileName)).toList(),
-    });
+    final formData = FormData();
+    formData.fields.addAll([
+      MapEntry('LeaveTypeId', leaveTypeId.toString()),
+      MapEntry('StartDate', _formatDate(startDate)),
+      MapEntry('EndDate', _formatDate(endDate)),
+      if (reason != null) MapEntry('Reason', reason),
+    ]);
+
+    for (var i = 0; i < slots.length; i++) {
+      final slot = slots[i];
+      formData.files.add(MapEntry(
+        'Files',
+        slot.bytes != null
+            ? MultipartFile.fromBytes(slot.bytes!, filename: slot.fileName ?? 'file')
+            : MultipartFile.fromBytes(const <int>[], filename: ''),
+      ));
+      formData.fields.add(MapEntry('Notes[$i]', slot.note ?? ''));
+    }
 
     final response = await _run(() => _apiClient.dio.post('/hr/leave-requests/self', data: formData));
     return SubmitLeaveRequestResult.fromJson(response.data as Map<String, dynamic>);

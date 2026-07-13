@@ -187,27 +187,21 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get attachmentLabel => 'Lampiran (opsional)';
-
-  @override
-  String get attachmentLabelRequired => 'Lampiran (wajib)';
-
-  @override
   String get attachmentPlaceholder => 'Ketuk untuk lampirkan file';
 
   @override
   String get attachmentTooLarge => 'Ukuran file maksimal 5 MB.';
 
   @override
-  String get attachmentRequiredMessage => 'Mohon lampirkan minimal satu file.';
-
-  @override
-  String attachmentMaxCountMessage(int count) {
-    return 'Anda dapat melampirkan maksimal $count file.';
+  String attachmentSlotRequiredMessage(String name) {
+    return '$name wajib diisi.';
   }
 
   @override
-  String get attachmentAddButton => 'Tambah File';
+  String get attachmentRequiredTag => 'Wajib';
+
+  @override
+  String get attachmentOptionalTag => 'Opsional';
 
   @override
   String get attachmentRemoveTooltip => 'Hapus';

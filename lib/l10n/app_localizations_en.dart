@@ -187,27 +187,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get attachmentLabel => 'Attachment (optional)';
-
-  @override
-  String get attachmentLabelRequired => 'Attachment (required)';
-
-  @override
   String get attachmentPlaceholder => 'Tap to attach a file';
 
   @override
   String get attachmentTooLarge => 'File must be 5 MB or smaller.';
 
   @override
-  String get attachmentRequiredMessage => 'Please attach at least one file.';
-
-  @override
-  String attachmentMaxCountMessage(int count) {
-    return 'You can attach up to $count file(s).';
+  String attachmentSlotRequiredMessage(String name) {
+    return '$name is required.';
   }
 
   @override
-  String get attachmentAddButton => 'Add File';
+  String get attachmentRequiredTag => 'Required';
+
+  @override
+  String get attachmentOptionalTag => 'Optional';
 
   @override
   String get attachmentRemoveTooltip => 'Remove';

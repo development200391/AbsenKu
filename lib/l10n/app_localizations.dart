@@ -424,18 +424,6 @@ abstract class AppLocalizations {
   /// **'{startDate} - {endDate} ({totalDays} hari)'**
   String leavePeriodSummary(String startDate, String endDate, String totalDays);
 
-  /// Label for the optional attachment picker on the leave-request form
-  ///
-  /// In id, this message translates to:
-  /// **'Lampiran (opsional)'**
-  String get attachmentLabel;
-
-  /// Label for the attachment picker when the module config marks it as required
-  ///
-  /// In id, this message translates to:
-  /// **'Lampiran (wajib)'**
-  String get attachmentLabelRequired;
-
   /// Placeholder shown before a file has been attached
   ///
   /// In id, this message translates to:
@@ -448,23 +436,23 @@ abstract class AppLocalizations {
   /// **'Ukuran file maksimal 5 MB.'**
   String get attachmentTooLarge;
 
-  /// Validation error shown when the config requires an attachment but none was picked
+  /// Validation error shown when a specific attachment slot is required but was left empty
   ///
   /// In id, this message translates to:
-  /// **'Mohon lampirkan minimal satu file.'**
-  String get attachmentRequiredMessage;
+  /// **'{name} wajib diisi.'**
+  String attachmentSlotRequiredMessage(String name);
 
-  /// Shown when the user tries to pick more files than the config's max file count
+  /// Short tag next to an attachment slot's name when it is required
   ///
   /// In id, this message translates to:
-  /// **'Anda dapat melampirkan maksimal {count} file.'**
-  String attachmentMaxCountMessage(int count);
+  /// **'Wajib'**
+  String get attachmentRequiredTag;
 
-  /// Button to pick another attachment file when multi-file is allowed
+  /// Short tag next to an attachment slot's name when it is optional
   ///
   /// In id, this message translates to:
-  /// **'Tambah File'**
-  String get attachmentAddButton;
+  /// **'Opsional'**
+  String get attachmentOptionalTag;
 
   /// Tooltip for the button that removes a picked (not-yet-uploaded) attachment
   ///
