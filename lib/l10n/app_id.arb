@@ -179,6 +179,14 @@
     }
   },
 
+  "leaveReasonSummary": "Alasan: {reason}",
+  "@leaveReasonSummary": {
+    "description": "Reason line shown under each entry in the leave-request history list",
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
+
   "attachmentPlaceholder": "Ketuk untuk lampirkan file",
   "@attachmentPlaceholder": {"description": "Placeholder shown before a file has been attached"},
 

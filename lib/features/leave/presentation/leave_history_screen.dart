@@ -129,13 +129,23 @@ class _LeaveHistoryScreenState extends State<LeaveHistoryScreen> {
             separatorBuilder: (_, _) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final request = requests[index];
+              final reason = request.reason?.trim();
               return ListTile(
                 title: Text(request.leaveTypeName),
-                subtitle: Text(l10n.leavePeriodSummary(
-                  DateFormat('d MMM yyyy', locale).format(request.startDate),
-                  DateFormat('d MMM yyyy', locale).format(request.endDate),
-                  request.totalDays.toString(),
-                )),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.leavePeriodSummary(
+                      DateFormat('d MMM yyyy', locale).format(request.startDate),
+                      DateFormat('d MMM yyyy', locale).format(request.endDate),
+                      request.totalDays.toString(),
+                    )),
+                    if (reason != null && reason.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(l10n.leaveReasonSummary(reason)),
+                    ],
+                  ],
+                ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

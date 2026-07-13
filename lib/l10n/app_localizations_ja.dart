@@ -184,6 +184,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String leaveReasonSummary(String reason) {
+    return '理由: $reason';
+  }
+
+  @override
   String get attachmentPlaceholder => 'タップしてファイルを添付';
 
   @override

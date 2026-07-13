@@ -55,6 +55,7 @@
   "leaveStatusApproved": "承認済み",
   "leaveStatusRejected": "却下",
   "leavePeriodSummary": "{startDate} 〜 {endDate}（{totalDays}日）",
+  "leaveReasonSummary": "理由: {reason}",
   "attachmentPlaceholder": "タップしてファイルを添付",
   "attachmentTooLarge": "ファイルサイズは5MB以内にしてください。",
   "attachmentSlotRequiredMessage": "{name}は必須です。",

@@ -55,6 +55,7 @@
   "leaveStatusApproved": "Approved",
   "leaveStatusRejected": "Rejected",
   "leavePeriodSummary": "{startDate} - {endDate} ({totalDays} day(s))",
+  "leaveReasonSummary": "Reason: {reason}",
   "attachmentPlaceholder": "Tap to attach a file",
   "attachmentTooLarge": "File must be 5 MB or smaller.",
   "attachmentSlotRequiredMessage": "{name} is required.",

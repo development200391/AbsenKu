@@ -187,6 +187,11 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String leaveReasonSummary(String reason) {
+    return 'Alasan: $reason';
+  }
+
+  @override
   String get attachmentPlaceholder => 'Ketuk untuk lampirkan file';
 
   @override

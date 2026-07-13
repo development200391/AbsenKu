@@ -187,6 +187,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String leaveReasonSummary(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
   String get attachmentPlaceholder => 'Tap to attach a file';
 
   @override

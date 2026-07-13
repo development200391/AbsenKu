@@ -424,6 +424,12 @@ abstract class AppLocalizations {
   /// **'{startDate} - {endDate} ({totalDays} hari)'**
   String leavePeriodSummary(String startDate, String endDate, String totalDays);
 
+  /// Reason line shown under each entry in the leave-request history list
+  ///
+  /// In id, this message translates to:
+  /// **'Alasan: {reason}'**
+  String leaveReasonSummary(String reason);
+
   /// Placeholder shown before a file has been attached
   ///
   /// In id, this message translates to:
