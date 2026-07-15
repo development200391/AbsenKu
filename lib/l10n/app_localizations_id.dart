@@ -222,4 +222,47 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get noAttachments => 'Tidak ada lampiran.';
+
+  @override
+  String get cancelButton => 'Batal';
+
+  @override
+  String get approvalInboxTooltip => 'Kotak Masuk Approval';
+
+  @override
+  String get approvalInboxTitle => 'Kotak Masuk Approval';
+
+  @override
+  String get noApprovalInbox => 'Tidak ada approval yang menunggu Anda.';
+
+  @override
+  String approvalRequestedBySummary(String requestedBy, String date) {
+    return 'Oleh $requestedBy · $date';
+  }
+
+  @override
+  String approvalDueLabel(String date) {
+    return 'Batas waktu $date';
+  }
+
+  @override
+  String get approvalOverdueTag => 'Terlambat';
+
+  @override
+  String get approveButton => 'Setujui';
+
+  @override
+  String get rejectButton => 'Tolak';
+
+  @override
+  String get approveConfirmMessage => 'Setujui request ini?';
+
+  @override
+  String get rejectConfirmMessage => 'Tolak request ini?';
+
+  @override
+  String get approvalApprovedMessage => 'Request disetujui.';
+
+  @override
+  String get approvalRejectedMessage => 'Request ditolak.';
 }

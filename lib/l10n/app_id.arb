@@ -218,5 +218,53 @@
   "@attachmentsTitle": {"description": "Title of the attachments bottom sheet on the leave-history screen"},
 
   "noAttachments": "Tidak ada lampiran.",
-  "@noAttachments": {"description": "Shown when a leave request has no attachments"}
+  "@noAttachments": {"description": "Shown when a leave request has no attachments"},
+
+  "cancelButton": "Batal",
+  "@cancelButton": {"description": "Generic Cancel button"},
+
+  "approvalInboxTooltip": "Kotak Masuk Approval",
+  "@approvalInboxTooltip": {"description": "Tooltip for the approval-inbox icon button on the home screen app bar"},
+
+  "approvalInboxTitle": "Kotak Masuk Approval",
+  "@approvalInboxTitle": {"description": "App bar title for the approval-inbox screen"},
+
+  "noApprovalInbox": "Tidak ada approval yang menunggu Anda.",
+  "@noApprovalInbox": {"description": "Shown when there is nothing waiting for the current user's approval"},
+
+  "approvalRequestedBySummary": "Oleh {requestedBy} · {date}",
+  "@approvalRequestedBySummary": {
+    "description": "Requester name and submitted-at date shown under each approval-inbox row",
+    "placeholders": {
+      "requestedBy": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+
+  "approvalDueLabel": "Batas waktu {date}",
+  "@approvalDueLabel": {
+    "description": "Due date shown on each approval-inbox row",
+    "placeholders": {"date": {"type": "String"}}
+  },
+
+  "approvalOverdueTag": "Terlambat",
+  "@approvalOverdueTag": {"description": "Tag shown when an approval-inbox row is past its due date"},
+
+  "approveButton": "Setujui",
+  "@approveButton": {"description": "Button that approves an approval-inbox request"},
+
+  "rejectButton": "Tolak",
+  "@rejectButton": {"description": "Button that rejects an approval-inbox request"},
+
+  "approveConfirmMessage": "Setujui request ini?",
+  "@approveConfirmMessage": {"description": "Confirmation dialog message before approving a request"},
+
+  "rejectConfirmMessage": "Tolak request ini?",
+  "@rejectConfirmMessage": {"description": "Confirmation dialog message before rejecting a request"},
+
+  "approvalApprovedMessage": "Request disetujui.",
+  "@approvalApprovedMessage": {"description": "Shown after successfully approving a request"},
+
+  "approvalRejectedMessage": "Request ditolak.",
+  "@approvalRejectedMessage": {"description": "Shown after successfully rejecting a request"}
 }

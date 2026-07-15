@@ -489,6 +489,84 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Tidak ada lampiran.'**
   String get noAttachments;
+
+  /// Generic Cancel button
+  ///
+  /// In id, this message translates to:
+  /// **'Batal'**
+  String get cancelButton;
+
+  /// Tooltip for the approval-inbox icon button on the home screen app bar
+  ///
+  /// In id, this message translates to:
+  /// **'Kotak Masuk Approval'**
+  String get approvalInboxTooltip;
+
+  /// App bar title for the approval-inbox screen
+  ///
+  /// In id, this message translates to:
+  /// **'Kotak Masuk Approval'**
+  String get approvalInboxTitle;
+
+  /// Shown when there is nothing waiting for the current user's approval
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada approval yang menunggu Anda.'**
+  String get noApprovalInbox;
+
+  /// Requester name and submitted-at date shown under each approval-inbox row
+  ///
+  /// In id, this message translates to:
+  /// **'Oleh {requestedBy} · {date}'**
+  String approvalRequestedBySummary(String requestedBy, String date);
+
+  /// Due date shown on each approval-inbox row
+  ///
+  /// In id, this message translates to:
+  /// **'Batas waktu {date}'**
+  String approvalDueLabel(String date);
+
+  /// Tag shown when an approval-inbox row is past its due date
+  ///
+  /// In id, this message translates to:
+  /// **'Terlambat'**
+  String get approvalOverdueTag;
+
+  /// Button that approves an approval-inbox request
+  ///
+  /// In id, this message translates to:
+  /// **'Setujui'**
+  String get approveButton;
+
+  /// Button that rejects an approval-inbox request
+  ///
+  /// In id, this message translates to:
+  /// **'Tolak'**
+  String get rejectButton;
+
+  /// Confirmation dialog message before approving a request
+  ///
+  /// In id, this message translates to:
+  /// **'Setujui request ini?'**
+  String get approveConfirmMessage;
+
+  /// Confirmation dialog message before rejecting a request
+  ///
+  /// In id, this message translates to:
+  /// **'Tolak request ini?'**
+  String get rejectConfirmMessage;
+
+  /// Shown after successfully approving a request
+  ///
+  /// In id, this message translates to:
+  /// **'Request disetujui.'**
+  String get approvalApprovedMessage;
+
+  /// Shown after successfully rejecting a request
+  ///
+  /// In id, this message translates to:
+  /// **'Request ditolak.'**
+  String get approvalRejectedMessage;
 }
 
 class _AppLocalizationsDelegate

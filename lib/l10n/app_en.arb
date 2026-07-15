@@ -65,5 +65,18 @@
   "attachmentWarningsTitle": "Attachment Warning",
   "okButton": "OK",
   "attachmentsTitle": "Attachments",
-  "noAttachments": "No attachments."
+  "noAttachments": "No attachments.",
+  "cancelButton": "Cancel",
+  "approvalInboxTooltip": "Approval Inbox",
+  "approvalInboxTitle": "Approval Inbox",
+  "noApprovalInbox": "No approvals waiting for you.",
+  "approvalRequestedBySummary": "By {requestedBy} · {date}",
+  "approvalDueLabel": "Due {date}",
+  "approvalOverdueTag": "Overdue",
+  "approveButton": "Approve",
+  "rejectButton": "Reject",
+  "approveConfirmMessage": "Approve this request?",
+  "rejectConfirmMessage": "Reject this request?",
+  "approvalApprovedMessage": "Request approved.",
+  "approvalRejectedMessage": "Request rejected."
 }

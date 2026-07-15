@@ -9,6 +9,8 @@ import '../../../core/brand.dart';
 import '../../../core/language_picker.dart';
 import '../../../core/locale_controller.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../approval/data/approval_repository.dart';
+import '../../approval/presentation/approval_inbox_screen.dart';
 import '../../auth/auth_repository.dart';
 import '../../leave/data/leave_repository.dart';
 import '../../leave/presentation/leave_request_screen.dart';
@@ -23,6 +25,7 @@ class HomeScreen extends StatefulWidget {
     super.key,
     required this.attendanceRepository,
     required this.leaveRepository,
+    required this.approvalRepository,
     required this.authRepository,
     required this.authSession,
     required this.localeController,
@@ -30,6 +33,7 @@ class HomeScreen extends StatefulWidget {
 
   final AttendanceRepository attendanceRepository;
   final LeaveRepository leaveRepository;
+  final ApprovalRepository approvalRepository;
   final AuthRepository authRepository;
   final AuthSession authSession;
   final LocaleController localeController;
@@ -44,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   bool _isSubmitting = false;
   String? _errorMessage;
+  int _pendingApprovalCount = 0;
 
   Duration _serverOffset = Duration.zero;
   DateTime _clock = DateTime.now();
@@ -98,6 +103,21 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
         _errorMessage = _describeError(e);
       });
+    }
+
+    unawaited(_loadApprovalCount());
+  }
+
+  /// Isolated from [_load]'s try/catch on purpose: the approval badge is a
+  /// nice-to-have, so a hiccup fetching it must never block or error out
+  /// today's attendance status.
+  Future<void> _loadApprovalCount() async {
+    try {
+      final dashboard = await widget.approvalRepository.getDashboard();
+      if (!mounted) return;
+      setState(() => _pendingApprovalCount = dashboard.waitingMyActionCount);
+    } catch (_) {
+      // Silently leave the badge as-is (or hidden) — this is background info.
     }
   }
 
@@ -162,6 +182,20 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.language),
             tooltip: l10n.languageTooltip,
             onPressed: () => showLanguagePicker(context, widget.localeController),
+          ),
+          IconButton(
+            icon: Badge(
+              label: Text('$_pendingApprovalCount'),
+              isLabelVisible: _pendingApprovalCount > 0,
+              child: const Icon(Icons.fact_check_outlined),
+            ),
+            tooltip: l10n.approvalInboxTooltip,
+            onPressed: () async {
+              await Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => ApprovalInboxScreen(approvalRepository: widget.approvalRepository),
+              ));
+              _loadApprovalCount();
+            },
           ),
           IconButton(
             icon: const Icon(Icons.history),

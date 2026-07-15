@@ -219,4 +219,47 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get noAttachments => '添付ファイルはありません。';
+
+  @override
+  String get cancelButton => 'キャンセル';
+
+  @override
+  String get approvalInboxTooltip => '承認受信箱';
+
+  @override
+  String get approvalInboxTitle => '承認受信箱';
+
+  @override
+  String get noApprovalInbox => '承認待ちの申請はありません。';
+
+  @override
+  String approvalRequestedBySummary(String requestedBy, String date) {
+    return '$requestedBy 提出・$date';
+  }
+
+  @override
+  String approvalDueLabel(String date) {
+    return '期限 $date';
+  }
+
+  @override
+  String get approvalOverdueTag => '期限超過';
+
+  @override
+  String get approveButton => '承認';
+
+  @override
+  String get rejectButton => '却下';
+
+  @override
+  String get approveConfirmMessage => 'この申請を承認しますか？';
+
+  @override
+  String get rejectConfirmMessage => 'この申請を却下しますか？';
+
+  @override
+  String get approvalApprovedMessage => '申請を承認しました。';
+
+  @override
+  String get approvalRejectedMessage => '申請を却下しました。';
 }

@@ -222,4 +222,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noAttachments => 'No attachments.';
+
+  @override
+  String get cancelButton => 'Cancel';
+
+  @override
+  String get approvalInboxTooltip => 'Approval Inbox';
+
+  @override
+  String get approvalInboxTitle => 'Approval Inbox';
+
+  @override
+  String get noApprovalInbox => 'No approvals waiting for you.';
+
+  @override
+  String approvalRequestedBySummary(String requestedBy, String date) {
+    return 'By $requestedBy · $date';
+  }
+
+  @override
+  String approvalDueLabel(String date) {
+    return 'Due $date';
+  }
+
+  @override
+  String get approvalOverdueTag => 'Overdue';
+
+  @override
+  String get approveButton => 'Approve';
+
+  @override
+  String get rejectButton => 'Reject';
+
+  @override
+  String get approveConfirmMessage => 'Approve this request?';
+
+  @override
+  String get rejectConfirmMessage => 'Reject this request?';
+
+  @override
+  String get approvalApprovedMessage => 'Request approved.';
+
+  @override
+  String get approvalRejectedMessage => 'Request rejected.';
 }

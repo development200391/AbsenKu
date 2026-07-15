@@ -65,5 +65,18 @@
   "attachmentWarningsTitle": "添付ファイルの警告",
   "okButton": "OK",
   "attachmentsTitle": "添付ファイル",
-  "noAttachments": "添付ファイルはありません。"
+  "noAttachments": "添付ファイルはありません。",
+  "cancelButton": "キャンセル",
+  "approvalInboxTooltip": "承認受信箱",
+  "approvalInboxTitle": "承認受信箱",
+  "noApprovalInbox": "承認待ちの申請はありません。",
+  "approvalRequestedBySummary": "{requestedBy} 提出・{date}",
+  "approvalDueLabel": "期限 {date}",
+  "approvalOverdueTag": "期限超過",
+  "approveButton": "承認",
+  "rejectButton": "却下",
+  "approveConfirmMessage": "この申請を承認しますか？",
+  "rejectConfirmMessage": "この申請を却下しますか？",
+  "approvalApprovedMessage": "申請を承認しました。",
+  "approvalRejectedMessage": "申請を却下しました。"
 }
