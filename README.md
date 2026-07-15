@@ -1,6 +1,6 @@
 # AbsenKu
 
-Aplikasi mobile (Flutter) untuk absensi karyawan berbasis lokasi (GPS), terhubung langsung ke backend **SINARA ERP** (`ERP.API`, modul HR). Karyawan login pakai akun ERP yang sama, lalu bisa check-in/check-out dan mengajukan izin dari HP tanpa perlu buka aplikasi web ERP.
+Aplikasi mobile (Flutter) untuk absensi karyawan berbasis lokasi (GPS), terhubung langsung ke backend **SINARA ERP** (`ERP.API`, modul HR). Karyawan login pakai akun ERP yang sama, lalu bisa check-in/check-out dan mengajukan izin dari HP tanpa perlu buka aplikasi web ERP. Karyawan yang juga jadi atasan/approver (mis. manajer departemen) bisa langsung approve/reject pengajuan bawahannya dari HP juga, lewat integrasi ke modul **General Approval** ERP (lihat poin 5).
 
 ## Alur Aplikasi & Menu
 
@@ -35,6 +35,8 @@ Status kehadiran (Hadir/Terlambat, dst) **tidak** dihitung otomatis dari jam che
 
 **Jam server (server-time)** — jam yang tampil di Beranda diambil sekali lewat `GET /api/v1/diagnostics/server-time` saat layar dibuka, lalu app menghitung selisih (offset) ke jam HP dan menjalankan jam itu sendiri di client (tick tiap detik) tanpa perlu polling server terus-menerus. Kalau jam HP diubah user setelah offset dihitung, tampilan tetap akurat karena berbasis offset, bukan jam HP mentah.
 
+**Ikon Approval Inbox** — di pojok kanan atas Beranda (sebelah ikon bahasa), ada ikon dengan badge angka yang menunjukkan berapa banyak pengajuan yang sedang menunggu approval dari user yang login. Badge otomatis kosong/tersembunyi kalau user bukan approver siapapun — tidak ada pengaturan "jadi approver" di app, badge-nya murni ngikutin data dari server. Detail di poin 5.
+
 ### 3. Ajukan Absen / Setengah Hari
 Diakses lewat tombol "Ajukan Absen / Setengah Hari" di Beranda. Dipakai kalau karyawan **tidak** melakukan check-in/check-out normal hari itu, tapi cuma perlu koreksi/laporan status hari itu juga (bukan pengajuan resmi yang butuh persetujuan atasan):
 - Pilih tanggal (default hari ini, bisa mundur/maju).
@@ -55,14 +57,23 @@ Diakses lewat tombol "Ajukan Cuti / Sakit" di Beranda — terpisah dari menu Abs
 - Ada ikon riwayat (🕐) di pojok kanan atas layar ini untuk melihat status semua pengajuan cuti yang pernah dibuat (Menunggu/Disetujui/Ditolak) — dan di layar Riwayat Cuti, tiap pengajuan menampilkan periode tanggal, **alasan yang diisi saat pengajuan (kalau ada)**, dan ikon lampiran (📎) yang buka daftar file yang sudah diupload untuk pengajuan itu.
 - Endpoint: `GET/POST /api/v1/hr/leave-requests/self` (submit gabungan field + lampiran dalam satu multipart request), `GET /api/v1/hr/leave-requests/self/leave-types`, `GET /api/v1/documents/config?referenceType=` (aturan validasi lampiran), `GET /api/v1/documents` (list lampiran untuk Riwayat Cuti).
 
-### 5. Riwayat Absensi (History)
+### 5. Approval Inbox (untuk yang jadi approver)
+Diakses lewat ikon di pojok kanan atas Beranda (lihat poin 2). Ini konsumen mobile pertama dari modul **General Approval** ERP (`ReadMeGeneralApproval.md` di repo `ERP.API`) — mesin approval generik lintas modul, bukan sesuatu yang dibangun khusus untuk cuti. Saat ini baru pengajuan **Cuti/Sakit** (poin 4) yang lewat mesin ini, tapi daftarnya otomatis akan ikut menampilkan modul lain (mis. Fixed Assets, Purchasing) begitu modul-modul itu terhubung ke General Approval di sisi backend, tanpa perlu update app.
+- Layar menampilkan daftar request yang **sedang menunggu approval dari user yang login** — server yang scope datanya per-user (lewat token login), app tidak perlu tahu/mengatur siapa yang "boleh jadi approver".
+- Tiap baris menampilkan subjek request (untuk cuti: jenis cuti + nama karyawan + rentang tanggal), nama pengaju, waktu pengajuan, dan batas waktu (due date) — ditandai merah kalau sudah lewat batas (overdue).
+- Tombol **✓ (Approve)** dan **✕ (Reject)** di tiap baris, masing-masing minta konfirmasi dulu lewat dialog sebelum dikirim ke server. Belum ada kolom alasan/komentar saat reject dari mobile (sama seperti Approval Inbox di ERP Web saat ini) — kalau suatu saat ada template approval yang mewajibkan komentar reject, server akan menolak dengan pesan error yang ditampilkan apa adanya.
+- Approve/reject yang berhasil langsung menghilangkan baris itu dari daftar (tanpa reload penuh) dan menampilkan konfirmasi singkat di bawah layar.
+- **Server yang menegakkan siapa yang boleh bertindak** — kalau user yang login ternyata bukan approver yang sah untuk request itu (mis. bukan manajer departemen si pengaju), server menolak dan pesannya ditampilkan di layar; app sendiri tidak melakukan pengecekan role/permission apapun.
+- Endpoint: `GET /api/v1/approval/dashboard` (jumlah untuk badge di Beranda), `GET /api/v1/approval/inbox` (daftar), `POST /api/v1/approval/requests/{id}/actions/approve`, `POST /api/v1/approval/requests/{id}/actions/reject`.
+
+### 6. Riwayat Absensi (History)
 Diakses lewat ikon jam di pojok kanan atas Beranda. Menampilkan daftar semua catatan absensi karyawan yang login: tanggal, jam check-in/out, dan status — untuk melihat rekap tanpa perlu buka ERP Web.
 - Endpoint: `GET /api/v1/hr/attendance/self/history`.
 
-### 6. Logout
+### 7. Logout
 Ikon logout di pojok kanan atas Beranda. Menghapus token yang tersimpan di HP dan memberitahu server untuk mencabut refresh token tersebut.
 
-### 7. Bahasa (Language)
+### 8. Bahasa (Language)
 Ikon globe (🌐) di Beranda maupun layar Login membuka dialog pilih bahasa: **Ikuti Bahasa Sistem** (default, ikut setting HP), **Bahasa Indonesia**, **English**, atau **日本語**. Pilihan disimpan di HP secara terpisah dari sesi login — jadi **tidak ikut terhapus saat logout**, dan tetap kepakai walau app di-restart.
 - Semua teks UI (label, tombol, pesan validasi, dll) diterjemahkan lewat `flutter_localizations` + file ARB (`lib/l10n/app_id.arb`, `app_en.arb`, `app_ja.arb`). Format tanggal (nama hari/bulan) ikut menyesuaikan bahasa yang aktif.
 - **Yang tidak ikut diterjemahkan**: pesan error yang datang langsung dari API (field `message` di response gagal, mis. validasi jarak kantor atau error login) — itu ditampilkan apa adanya sesuai bahasa yang ditulis di backend, karena `ERP.API` sendiri belum punya mekanisme multi-bahasa untuk pesan error. Hanya pesan client-side (koneksi gagal, validasi form, dll) yang mengikuti pilihan bahasa di atas.
@@ -70,6 +81,8 @@ Ikon globe (🌐) di Beranda maupun layar Login membuka dialog pilih bahasa: **I
 
 ## Konfigurasi Terkait (untuk Admin HR di ERP Web)
 Sebelum karyawan bisa check-in, admin HR perlu mengisi **lokasi kantor & radius** di halaman *HR → Attendance → Attendance Setting* (ERP Web): latitude, longitude, dan radius (meter) toleransi jarak. Field ini baru ditambahkan bersamaan dengan fitur mobile ini.
+
+Supaya Approval Inbox (poin 5) bisa nemuin approver-nya, departemen karyawan (*HR → Departments*) **harus punya Manager ter-set** — pengajuan cuti karyawan di departemen yang manager-nya kosong akan gagal submit dengan pesan error dari server, bukan diam-diam tidak muncul di Approval Inbox siapapun.
 
 ## Arsitektur Singkat
 ```
@@ -86,11 +99,15 @@ lib/
       models/      # model data (LeaveRequest, LeaveType, LeaveStatus)
       data/        # pemanggilan API leave-requests self-service
       presentation/# layar Ajukan Cuti/Sakit, Riwayat Cuti
+    approval/
+      models/      # model data (ApprovalInboxItem, ApprovalDashboard, ApprovalRequestStatus)
+      data/        # pemanggilan API General Approval (dashboard/inbox/approve/reject)
+      presentation/# layar Approval Inbox
   l10n/            # file ARB (id/en/ja) + AppLocalizations hasil generate (flutter gen-l10n)
 ```
 File inti di `core/`: `api_client.dart`, `api_exception.dart` (tipe error bersama: `ConnectionException`/`ApiException`/`UnknownApiException`), `auth_session.dart`, `biometric_auth_service.dart`, `locale_controller.dart`, `language_picker.dart`, `secure_storage.dart`.
 
-Backend: `D:\NET\SINARA\ERP.API` (ASP.NET Core 8 + PostgreSQL), khususnya `Controllers/v1/HR/SelfAttendanceController.cs`, `Controllers/v1/HR/LeaveRequestsController.cs`, `Services/HR/AttendanceService.cs`, `Services/HR/LeaveService.cs`, dan `Controllers/v1/DiagnosticsController.cs` (endpoint `server-time`). Detail lengkap modul HR ada di `D:\NET\SINARA\ReadMeHr.md`.
+Backend: `D:\NET\SINARA\ERP.API` (ASP.NET Core 8 + PostgreSQL), khususnya `Controllers/v1/HR/SelfAttendanceController.cs`, `Controllers/v1/HR/LeaveRequestsController.cs`, `Services/HR/AttendanceService.cs`, `Services/HR/LeaveService.cs`, `Controllers/v1/Approval/ApprovalDashboardController.cs` + `ApprovalInboxController.cs` + `ApprovalRequestsController.cs`, dan `Controllers/v1/DiagnosticsController.cs` (endpoint `server-time`). Detail lengkap modul HR ada di `D:\NET\SINARA\ReadMeHr.md`, detail lengkap mesin General Approval (routing engine, siapa jadi approver, dst.) ada di `D:\NET\SINARA\ReadMeGeneralApproval.md`.
 
 ## Penanganan Error & Logging
 Supaya error yang terjadi di HP karyawan tidak "hilang begitu saja" (tidak ada console yang bisa dilihat developer), ada mekanisme berikut:
