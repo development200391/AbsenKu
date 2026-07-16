@@ -5,6 +5,7 @@ import '../../../core/api_exception.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/leave_repository.dart';
 import '../models/leave_models.dart';
+import 'attachment_list_tile.dart';
 
 class LeaveHistoryScreen extends StatefulWidget {
   const LeaveHistoryScreen({super.key, required this.leaveRepository});
@@ -78,11 +79,9 @@ class _LeaveHistoryScreenState extends State<LeaveHistoryScreen> {
                         child: Text(l10n.noAttachments),
                       )
                     else
-                      ...documents.map((doc) => ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: const Icon(Icons.attach_file),
-                            title: Text(doc.originalFileName),
-                            subtitle: Text('${(doc.fileSizeBytes / 1024).toStringAsFixed(0)} KB'),
+                      ...documents.map((doc) => AttachmentListTile(
+                            document: doc,
+                            leaveRepository: widget.leaveRepository,
                           )),
                   ],
                 );

@@ -192,7 +192,10 @@ class _HomeScreenState extends State<HomeScreen> {
             tooltip: l10n.approvalInboxTooltip,
             onPressed: () async {
               await Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => ApprovalInboxScreen(approvalRepository: widget.approvalRepository),
+                builder: (_) => ApprovalInboxScreen(
+                  approvalRepository: widget.approvalRepository,
+                  leaveRepository: widget.leaveRepository,
+                ),
               ));
               _loadApprovalCount();
             },

@@ -42,6 +42,17 @@ class LeaveRepository {
     return items.map((item) => LeaveRequest.fromJson(item as Map<String, dynamic>)).toList();
   }
 
+  /// Unlike every other method here, this is NOT `/self` — it looks up ANY
+  /// leave request by id, not just the caller's own. Used by the Approval
+  /// Inbox so an approver can see the full leave detail (reason, dates) for
+  /// someone else's request before deciding. The server endpoint has no
+  /// ownership check (see ReadMeHr.md), so this is safe to call for any id
+  /// the caller was already shown (e.g. via an ApprovalInboxItem).
+  Future<LeaveRequest> getById(int id) async {
+    final response = await _run(() => _apiClient.dio.get('/hr/leave-requests/$id'));
+    return LeaveRequest.fromJson(response.data as Map<String, dynamic>);
+  }
+
   Future<List<LeaveDocument>> getAttachments(int leaveRequestId) async {
     final response = await _run(() => _apiClient.dio.get('/documents', queryParameters: {
           'referenceType': _referenceType,
@@ -49,6 +60,18 @@ class LeaveRepository {
         }));
     final items = response.data as List<dynamic>;
     return items.map((item) => LeaveDocument.fromJson(item as Map<String, dynamic>)).toList();
+  }
+
+  /// Raw bytes of one attachment, for [openDownloadedFile] to save to a temp
+  /// file and hand off to an OS-level viewer. Same authorization rule as
+  /// viewing the attachment list (owner, back-office, or an active approver
+  /// for this leave request) — see ReadMeGeneralApproval.md.
+  Future<List<int>> downloadAttachment(int documentId) async {
+    final response = await _run(() => _apiClient.dio.get(
+          '/documents/$documentId/download',
+          options: Options(responseType: ResponseType.bytes),
+        ));
+    return response.data as List<int>;
   }
 
   /// Submits the leave request and every attachment slot together in a

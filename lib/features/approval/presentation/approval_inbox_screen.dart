@@ -3,13 +3,22 @@ import 'package:intl/intl.dart';
 
 import '../../../core/api_exception.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../leave/data/leave_repository.dart';
+import '../../leave/models/leave_models.dart';
+import '../../leave/presentation/attachment_list_tile.dart';
 import '../data/approval_repository.dart';
 import '../models/approval_models.dart';
 
+/// Reference types the Approval Inbox knows how to show a detail view for.
+/// Anything else (future modules wired into General Approval, e.g. Fixed
+/// Assets) just falls back to the generic row — no dead-end tap target.
+const _supportedDetailReferenceTypes = {'hr_leave_requests'};
+
 class ApprovalInboxScreen extends StatefulWidget {
-  const ApprovalInboxScreen({super.key, required this.approvalRepository});
+  const ApprovalInboxScreen({super.key, required this.approvalRepository, required this.leaveRepository});
 
   final ApprovalRepository approvalRepository;
+  final LeaveRepository leaveRepository;
 
   @override
   State<ApprovalInboxScreen> createState() => _ApprovalInboxScreenState();
@@ -108,6 +117,149 @@ class _ApprovalInboxScreenState extends State<ApprovalInboxScreen> {
     }
   }
 
+  Future<void> _showLeaveDetail(ApprovalInboxItem item) async {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: FutureBuilder<LeaveRequest>(
+              future: widget.leaveRepository.getById(item.referenceId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const SizedBox(
+                    height: 160,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return SizedBox(
+                    height: 100,
+                    child: Center(child: Text(_describeError(snapshot.error!))),
+                  );
+                }
+
+                final leave = snapshot.data!;
+                final reason = leave.reason?.trim();
+
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(item.requestedByName, style: Theme.of(context).textTheme.titleMedium),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.attach_file),
+                          tooltip: l10n.attachmentsTitle,
+                          onPressed: () => _showAttachments(item),
+                        ),
+                      ],
+                    ),
+                    Text(leave.leaveTypeName),
+                    const SizedBox(height: 4),
+                    Text(l10n.leavePeriodSummary(
+                      DateFormat('d MMM yyyy', locale).format(leave.startDate),
+                      DateFormat('d MMM yyyy', locale).format(leave.endDate),
+                      leave.totalDays.toString(),
+                    )),
+                    if (reason != null && reason.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(l10n.leaveReasonSummary(reason)),
+                    ],
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Navigator.of(sheetContext).pop();
+                              _handleAction(item, approve: false);
+                            },
+                            child: Text(l10n.rejectButton),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: () {
+                              Navigator.of(sheetContext).pop();
+                              _handleAction(item, approve: true);
+                            },
+                            child: Text(l10n.approveButton),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showAttachments(ApprovalInboxItem item) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: FutureBuilder<List<LeaveDocument>>(
+              future: widget.leaveRepository.getAttachments(item.referenceId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const SizedBox(
+                    height: 120,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return SizedBox(height: 100, child: Center(child: Text(_describeError(snapshot.error!))));
+                }
+
+                final documents = snapshot.data ?? [];
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.attachmentsTitle, style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    if (documents.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Text(l10n.noAttachments),
+                      )
+                    else
+                      ...documents.map((doc) => AttachmentListTile(
+                            document: doc,
+                            leaveRepository: widget.leaveRepository,
+                          )),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -162,8 +314,10 @@ class _ApprovalInboxScreenState extends State<ApprovalInboxScreen> {
 
         final item = items[index - (_errorMessage != null ? 1 : 0)];
         final isBusy = _busyRequestIds.contains(item.requestId);
+        final hasDetail = _supportedDetailReferenceTypes.contains(item.referenceType);
 
         return ListTile(
+          onTap: hasDetail ? () => _showLeaveDetail(item) : null,
           title: Text(item.subject),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
